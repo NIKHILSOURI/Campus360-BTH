@@ -7,6 +7,7 @@ TODO: Add one or more screenshots of the app, when you finalized the UI.  - To b
 
 ## Architecture Overview
 
+![Architecture](https://github.com/user-attachments/assets/8932ea39-3464-4ca6-b601-f77ac09c419c)
 
 
 
@@ -62,7 +63,7 @@ The APK is generated under `app/build/outputs/apk/debug/app-debug.apk`.
 
 ### Run
 
-Option A: Android Studio
+Android Studio
 - Open the project in Android Studio.
 - Select a device/emulator and click Run.
   
