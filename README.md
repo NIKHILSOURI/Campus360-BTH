@@ -7,7 +7,45 @@ TODO: Add one or more screenshots of the app, when you finalized the UI.
 
 ## Architecture Overview
 
-TODO: Add simple diagram that explains the architecture.
++--------------------------------------------------------------+
+|                         Android App                          |
+|                                                              |
+|  +----------------------+       +------------------------+   |
+|  |      UI Layer       |       |      Navigation        |    |
+|  |                     |<----->|   NavGraph / Screen    |    |
+|  |  - Home             |       +------------------------+    |
+|  |  - Search           |                                     |
+|  |  - Map              |       +------------------------+    |
+|  |  - Settings         |<----->|      ViewModels        |    |
+|  |  - ChooseStart      |       |  (State & Intents)     |    |
+|  |  - Destination      |       +------------------------+    |
+|  |  - CategoryResults  |                                     |
+|  |  - Splash           |                                     |
+|  +----------^-----------+                                    |
+|             |                                                |
+|             | observe state / send intents                   |
+|             v                                                |
+|       +------------------------+                             |
+|       |       Data Layer       |                             |
+|       |  MapRepository         |<------------------------+   |
+|       |  RoutingEngine (A*)    |                         |   |
+|       |  Graph / Route models  |                         |   |
+|       +-----------+------------+                         |   |
+|                   |                                      |   |
+|                   v                                      |   |
+|        +---------------------------+     +----------------+  |
+|        |   Assets & JSON Storage   |     |   Utilities    |  |
+|        |  - Floor new.png          |     | - contact info |  |
+|        |  - map_info.json          |     | - about        |  |
+|        |  - rooms.json             |     +----------------+  |
+|        |  - graph.json             |                         |
+|        +---------------------------+                         |
+|                                                              |
+|  SOS Flow (US7):                                             |
+|  UI SOS action --> ViewModel --> Repository/RoutingEngine -->|
+|  compute nearest exit route --> Map UI highlights path       |
+|  and device dialer opens with security number                |
++--------------------------------------------------------------+
 
 ## User Stories
 
@@ -19,7 +57,7 @@ TODO: Add simple diagram that explains the architecture.
 | US4   | As a user,              | I want to explore points of interest like the library or cafeteria | so that I can experience campus life.            | POIs are discoverable via search and categories; details show info and an option to start routing. |
 | US5   | As a user,              | I want to choose my start location manually,                       | so that I can plan a route from any point.       | A start-location picker is available; chosen start is used to compute and render the route. |
 | US6   | As a user,              | I want destination details before I start navigating,              | so that I can confirm I selected the right place.| Details screen shows name, type, description, and actions like “Show on Map” and “Route”. |
-| US7   | As a Swedish-speaking user, | I want the app in Swedish automatically,                      | so that I understand the interface.              | UI strings appear in Swedish when device locale is sv-SE; English otherwise; persists app-wide. |
+| US7   | As a user,              | I want an SOS button that shows the nearest exit,                  | so that I can evacuate safely and get help.      | SOS action is always accessible on home screen; after confirmation, the app highlights the nearest exit and renders a route from my current/selected start|
 | US8   | As a user,              | I want clear feedback if no route is available,                    | so that I can adjust my plan.                    | If no path exists, a friendly message is shown and map/steps do not display an invalid route. |
 
 
@@ -51,18 +89,20 @@ Use
 
 ### Build
 
-TODO: Explain how the whole app can be build as an APK.
+Using Gradle (from project root):
+./gradlew clean assembleDebug
+The APK is generated under `app/build/outputs/apk/debug/app-debug.apk`.
 
 ### Test
 
-```sh
 ./gradlew test --rerun-tasks
-```
 
 ### Run
 
-TODO: Explain how to run the app on device or emulator.
-
+Option A: Android Studio
+- Open the project in Android Studio.
+- Select a device/emulator and click Run.
+  
 ## License
 
 TODO: Add license and copyright notice. If you are not sure which license you should chose, have a look at [Choose a License](https://choosealicense.com).
