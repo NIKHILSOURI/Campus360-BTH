@@ -3,49 +3,12 @@
 ## Introduction
 Campus360 is an Android app that helps students and visitors navigate the university campus. It provides indoor floor maps, searchable rooms and points of interest, category browsing, and turn-by-turn visual guidance powered by an A* routing engine over a bidirectional graph.
 
-TODO: Add one or more screenshots of the app, when you finalized the UI.
+TODO: Add one or more screenshots of the app, when you finalized the UI.  - To be upadated in future
 
 ## Architecture Overview
 
-+--------------------------------------------------------------+
-|                         Android App                          |
-|                                                              |
-|  +----------------------+       +------------------------+   |
-|  |      UI Layer       |       |      Navigation        |    |
-|  |                     |<----->|   NavGraph / Screen    |    |
-|  |  - Home             |       +------------------------+    |
-|  |  - Search           |                                     |
-|  |  - Map              |       +------------------------+    |
-|  |  - Settings         |<----->|      ViewModels        |    |
-|  |  - ChooseStart      |       |  (State & Intents)     |    |
-|  |  - Destination      |       +------------------------+    |
-|  |  - CategoryResults  |                                     |
-|  |  - Splash           |                                     |
-|  +----------^-----------+                                    |
-|             |                                                |
-|             | observe state / send intents                   |
-|             v                                                |
-|       +------------------------+                             |
-|       |       Data Layer       |                             |
-|       |  MapRepository         |<------------------------+   |
-|       |  RoutingEngine (A*)    |                         |   |
-|       |  Graph / Route models  |                         |   |
-|       +-----------+------------+                         |   |
-|                   |                                      |   |
-|                   v                                      |   |
-|        +---------------------------+     +----------------+  |
-|        |   Assets & JSON Storage   |     |   Utilities    |  |
-|        |  - Floor new.png          |     | - contact info |  |
-|        |  - map_info.json          |     | - about        |  |
-|        |  - rooms.json             |     +----------------+  |
-|        |  - graph.json             |                         |
-|        +---------------------------+                         |
-|                                                              |
-|  SOS Flow (US7):                                             |
-|  UI SOS action --> ViewModel --> Repository/RoutingEngine -->|
-|  compute nearest exit route --> Map UI highlights path       |
-|  and device dialer opens with security number                |
-+--------------------------------------------------------------+
+
+
 
 ## User Stories
 
@@ -86,7 +49,7 @@ Use
 [ ] US8
 
 ## How to Use
-
+  To be upadated in future
 ### Build
 
 Using Gradle (from project root):
@@ -105,4 +68,4 @@ Option A: Android Studio
   
 ## License
 
-TODO: Add license and copyright notice. If you are not sure which license you should chose, have a look at [Choose a License](https://choosealicense.com).
+  To be upadated in future [Choose a License](https://choosealicense.com).
