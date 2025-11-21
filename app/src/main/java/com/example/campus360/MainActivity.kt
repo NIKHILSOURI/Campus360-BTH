@@ -19,6 +19,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
+        
         val preferencesManager = PreferencesManager(this)
         val savedLanguage = preferencesManager.getLanguage() ?: "sv" 
         LocaleHelper.setLocale(this, savedLanguage)
