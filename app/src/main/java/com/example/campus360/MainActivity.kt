@@ -1,47 +1,45 @@
 package com.example.campus360
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.example.campus360.navigation.NavGraph
 import com.example.campus360.ui.theme.Campus360Theme
+import com.example.campus360.util.LocaleHelper
+import com.example.campus360.util.PreferencesManager
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        val preferencesManager = PreferencesManager(this)
+        val savedLanguage = preferencesManager.getLanguage() ?: "sv" 
+        LocaleHelper.setLocale(this, savedLanguage)
+        
         enableEdgeToEdge()
         setContent {
             Campus360Theme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    val navController = rememberNavController()
+                    NavGraph(navController = navController)
                 }
             }
         }
     }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Campus360Theme {
-        Greeting("Android")
+    
+    override fun attachBaseContext(newBase: Context?) {
+        val preferencesManager = PreferencesManager(newBase!!)
+        val savedLanguage = preferencesManager.getLanguage() ?: "sv" // Default to Swedish
+        super.attachBaseContext(LocaleHelper.setLocale(newBase, savedLanguage))
     }
 }
