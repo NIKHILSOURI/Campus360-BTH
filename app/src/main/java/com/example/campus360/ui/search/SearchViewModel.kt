@@ -40,7 +40,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     
     private fun loadRooms() {
         viewModelScope.launch {
-            // Ensure data is loaded
+            
             if (!repository.isDataLoaded()) {
                 repository.loadAllAssets()
             }
@@ -80,10 +80,10 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     
     fun onRoomClick(room: Room) {
         viewModelScope.launch {
-            // Save to recent destinations
+            
             preferencesManager.addRecentDestination(room.id)
             
-            // Navigate to destination details
+            
             _uiState.value = SearchUiState.NavigateToDestination(room.id)
         }
     }
