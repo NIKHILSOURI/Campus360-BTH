@@ -1,0 +1,182 @@
+[
+  {
+    "id": "J1610",
+    "name": "J1610",
+    "type": "class",
+    "position": {
+      "x": 150.0,
+      "y": 120.0
+    },
+    "nodeId": "node_j1610_center",
+    "building": "Building J",
+    "floor": "Floor 1"
+  },
+  {
+    "id": "J1620",
+    "name": "J1620",
+    "type": "class",
+    "position": {
+      "x": 300.0,
+      "y": 120.0
+    },
+    "nodeId": "node_j1620_center",
+    "building": "Building J",
+    "floor": "Floor 1"
+  },
+  {
+    "id": "J1350",
+    "name": "J1350",
+    "type": "class",
+    "position": {
+      "x": 450.0,
+      "y": 120.0
+    },
+    "nodeId": "node_j1350_center",
+    "building": "Building J",
+    "floor": "Floor 1"
+  },
+  {
+    "id": "J1640",
+    "name": "J1640",
+    "type": "class",
+    "position": {
+      "x": 600.0,
+      "y": 120.0
+    },
+    "nodeId": "node_j1640_center",
+    "building": "Building J",
+    "floor": "Floor 1"
+  },
+  {
+    "id": "J1650",
+    "name": "J1650",
+    "type": "class",
+    "position": {
+      "x": 750.0,
+      "y": 120.0
+    },
+    "nodeId": "node_j1650_center",
+    "building": "Building J",
+    "floor": "Floor 1"
+  },
+  {
+    "id": "CONFERENCE_HALL",
+    "name": "Conference Hall",
+    "type": "hall",
+    "position": {
+      "x": 150.0,
+      "y": 400.0
+    },
+    "nodeId": "node_conference_hall_center",
+    "building": "Building J",
+    "floor": "Floor 1"
+  },
+  {
+    "id": "POWER_PLANT",
+    "name": "Power Plant",
+    "type": "lab",
+    "position": {
+      "x": 900.0,
+      "y": 350.0
+    },
+    "nodeId": "node_power_plant_center",
+    "building": "Building J",
+    "floor": "Floor 1"
+  },
+  {
+    "id": "CAFE",
+    "name": "Cafe",
+    "type": "cafeteria",
+    "position": {
+      "x": 900.0,
+      "y": 600.0
+    },
+    "nodeId": "node_cafe_center",
+    "building": "Building J",
+    "floor": "Floor 1"
+  },
+  {
+    "id": "J1360",
+    "name": "J1360",
+    "type": "class",
+    "position": {
+      "x": 1050.0,
+      "y": 400.0
+    },
+    "nodeId": "node_j1360_center",
+    "building": "Building J",
+    "floor": "Floor 1"
+  },
+  {
+    "id": "J1270",
+    "name": "J1270",
+    "type": "class",
+    "position": {
+      "x": 1050.0,
+      "y": 550.0
+    },
+    "nodeId": "node_j1270_center",
+    "building": "Building J",
+    "floor": "Floor 1"
+  },
+  {
+    "id": "J1280",
+    "name": "J1280",
+    "type": "class",
+    "position": {
+      "x": 1050.0,
+      "y": 650.0
+    },
+    "nodeId": "node_j1280_center",
+    "building": "Building J",
+    "floor": "Floor 1"
+  },
+  {
+    "id": "ADMIN_1",
+    "name": "Admin Office 1",
+    "type": "student_service",
+    "position": {
+      "x": 1200.0,
+      "y": 500.0
+    },
+    "nodeId": "node_admin_1_center",
+    "building": "Building J",
+    "floor": "Floor 1"
+  },
+  {
+    "id": "ADMIN_2",
+    "name": "Admin Office 2",
+    "type": "student_service",
+    "position": {
+      "x": 1200.0,
+      "y": 600.0
+    },
+    "nodeId": "node_admin_2_center",
+    "building": "Building J",
+    "floor": "Floor 1"
+  },
+  {
+    "id": "NO_ADMISSION_1",
+    "name": "No Admission Area 1",
+    "type": "lab",
+    "position": {
+      "x": 1200.0,
+      "y": 300.0
+    },
+    "nodeId": "node_no_admission_1_center",
+    "building": "Building J",
+    "floor": "Floor 1"
+  },
+  {
+    "id": "NO_ADMISSION_2",
+    "name": "No Admission Area 2",
+    "type": "lab",
+    "position": {
+      "x": 1200.0,
+      "y": 200.0
+    },
+    "nodeId": "node_no_admission_2_center",
+    "building": "Building J",
+    "floor": "Floor 1"
+  }
+]
