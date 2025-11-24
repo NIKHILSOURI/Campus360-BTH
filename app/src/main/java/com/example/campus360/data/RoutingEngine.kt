@@ -273,10 +273,6 @@ class RoutingEngine(private val graph: Graph) {
         return graph.nodes.find { it.id == nodeId }
     }
     
-    /**
-     * Identifies exit nodes (nodes on the outer boundary of the building).
-     * A node is considered an exit if it's within a threshold distance from the map boundaries.
-     */
     fun getExitNodes(mapWidth: Double, mapHeight: Double, threshold: Double = 5.0): List<Node> {
         return graph.nodes.filter { node ->
             val nearLeft = node.x <= threshold
@@ -287,10 +283,7 @@ class RoutingEngine(private val graph: Graph) {
         }
     }
     
-    /**
-     * Finds the nearest exit node from a given start node.
-     * Returns null if no exit is reachable.
-     */
+
     fun findNearestExitNode(startNodeId: String, mapWidth: Double, mapHeight: Double): Node? {
         val startNode = graph.nodes.find { it.id == startNodeId } ?: return null
         val exitNodes = getExitNodes(mapWidth, mapHeight)
@@ -313,4 +306,5 @@ class RoutingEngine(private val graph: Graph) {
         return nearestExit
     }
 }
+
 
