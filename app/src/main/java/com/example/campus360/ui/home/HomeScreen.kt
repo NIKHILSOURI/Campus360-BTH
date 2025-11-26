@@ -108,26 +108,26 @@ fun HomeScreen(
                 .background(Color(0xFFF8F9FC))
                 .padding(innerPadding)
         ) {
-            // Header
+            
             Header(
                 onGlobeClick = { navController.navigate(Screen.Settings.route) }
             )
             
-            // Search Bar
+          
             SearchBar(
                 query = searchQuery,
                 onQueryChange = { searchQuery = it },
                 onSearchClick = { viewModel.search(searchQuery) }
             )
             
-            // Quick Categories
+            
             QuickCategories(
                 categories = categories,
                 selectedCategory = selectedCategory,
                 onCategoryClick = { viewModel.selectCategory(it) }
             )
             
-            // Recent Destinations
+            
             if (recentRooms.isNotEmpty()) {
                 RecentDestinations(
                     rooms = recentRooms,
@@ -139,7 +139,7 @@ fun HomeScreen(
             
             Spacer(modifier = Modifier.weight(1f))
             
-            // Open Map Button - Add spacing above and ensure proper padding
+            
             Spacer(modifier = Modifier.height(24.dp))
             OpenMapButton(
                 onClick = { viewModel.openMap() },
@@ -147,7 +147,7 @@ fun HomeScreen(
                     .padding(horizontal = 16.dp)
             )
             
-            // SOS Button
+            
             Spacer(modifier = Modifier.height(12.dp))
             SOSButton(
                 onClick = { viewModel.openSOS() },
