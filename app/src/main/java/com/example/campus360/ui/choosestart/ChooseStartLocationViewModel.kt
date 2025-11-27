@@ -1,5 +1,4 @@
 package com.example.campus360.ui.choosestart
-
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
 sealed class ChooseStartLocationUiState {
     object Idle : ChooseStartLocationUiState()
     data class NavigateToMap(val roomId: String, val startNodeId: String) : ChooseStartLocationUiState()
