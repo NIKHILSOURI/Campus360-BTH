@@ -343,7 +343,6 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                     initialBounds = BoundingBox(minX, minY, maxX, maxY)
                 }
             } else {
-                // exitNode is guaranteed to be non-null here (checked earlier)
                 initialBounds = BoundingBox(
                     exitNode.x - 20.0,
                     exitNode.y - 20.0,
