@@ -145,7 +145,7 @@ fun MapScreen(
                     }
                 }
                 is MapUiState.Ready -> {
-                    // Map View
+                
                     MapView(
                         bitmap = floorplanBitmap,
                         mapInfo = mapInfo,
@@ -163,23 +163,23 @@ fun MapScreen(
                             viewModel.updateMapState(mapState.scale, tx, ty)
                         },
                         onMapClick = if (pickMode || (sosMode && startNodeId.isEmpty())) { x, y ->
-                            // Handle map click in pick mode or SOS mode without startNodeId
+                            
                             try {
                                 Log.d("MapScreen", "Map clicked in ${if (sosMode) "SOS" else "pick"} mode at ($x, $y)")
                                 val node = viewModel.findNearestNode(x, y)
                                 node?.let {
                                     Log.d("MapScreen", "Node selected: ${it.id} at ($x, $y)")
                                     if (sosMode) {
-                                        // In SOS mode, navigate with the selected node as start
+                                        
                                         Log.d("MapScreen", "Navigating to SOS route: startNodeId=${it.id}")
                                         navController.navigate("${Screen.Map.route}?roomId=&startNodeId=${it.id}&pickMode=false&sosMode=true") {
                                             launchSingleTop = true
                                         }
                                     } else if (currentRoomId.isNotEmpty()) {
-                                        // Navigate to Map with the selected node as start
+                                        
                                         Log.d("MapScreen", "Navigating to map with route: roomId=$currentRoomId, startNodeId=${it.id}")
                                         navController.navigate("${Screen.Map.route}?roomId=$currentRoomId&startNodeId=${it.id}&pickMode=false&sosMode=false") {
-                                            // Pop back to ChooseStartLocation and remove it from back stack
+                                            
                                             popUpTo(Screen.ChooseStartLocation.route) {
                                                 inclusive = true
                                             }
@@ -317,7 +317,7 @@ private fun TopControls(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Back Button
+        
         FloatingActionButton(
             onClick = onBackClick,
             modifier = Modifier.size(48.dp),
@@ -336,7 +336,7 @@ private fun TopControls(
     }
 }
 
-// RightSideControls removed - not in design
+
 
 @Composable
 private fun NavigationStepsPanel(
@@ -352,7 +352,7 @@ private fun NavigationStepsPanel(
         modifier = modifier
             .fillMaxWidth(0.9f)
     ) {
-        // Steps Toggle Button
+        
         Button(
             onClick = onToggleSteps,
             modifier = Modifier.fillMaxWidth(),
@@ -396,7 +396,7 @@ private fun NavigationStepsPanel(
             }
         }
         
-        // Steps List (when expanded)
+        
         if (isExpanded) {
             Surface(
                 modifier = Modifier
@@ -512,7 +512,7 @@ private fun NavigationStepItem(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Step number
+            
             Surface(
                 modifier = Modifier.size(32.dp),
                 shape = CircleShape,
@@ -531,7 +531,7 @@ private fun NavigationStepItem(
                 }
             }
             
-            // Direction icon
+            
             val directionIcon = when (step.direction) {
                 NavigationDirection.START -> Icons.Default.PlayArrow
                 NavigationDirection.STRAIGHT -> Icons.AutoMirrored.Filled.ArrowForward
@@ -544,7 +544,7 @@ private fun NavigationStepItem(
                 NavigationDirection.ARRIVE -> Icons.Default.Flag
             }
             
-            // Rotate icon for left turns (rotate 90 degrees counter-clockwise)
+            
             val rotation = when (step.direction) {
                 NavigationDirection.LEFT -> -90f
                 NavigationDirection.SLIGHT_LEFT -> -45f
@@ -566,7 +566,7 @@ private fun NavigationStepItem(
                     .rotate(rotation)
             )
             
-            // Instruction text
+            
             Column(
                 modifier = Modifier.weight(1f)
             ) {
@@ -599,7 +599,7 @@ private fun BottomControls(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Recenter Button
+        
         FloatingActionButton(
             onClick = onRecenter,
             modifier = Modifier.size(48.dp),
@@ -614,7 +614,7 @@ private fun BottomControls(
             )
         }
         
-        // Zoom In
+        
         FloatingActionButton(
             onClick = onZoomIn,
             modifier = Modifier.size(48.dp),
@@ -629,7 +629,7 @@ private fun BottomControls(
             )
         }
         
-        // Zoom Out
+        
         FloatingActionButton(
             onClick = onZoomOut,
             modifier = Modifier.size(48.dp),
