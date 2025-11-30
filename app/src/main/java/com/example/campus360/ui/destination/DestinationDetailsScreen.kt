@@ -196,7 +196,7 @@ fun DestinationDetailsScreen(
     }
 }
 
-@Composable
+@composable
 private fun RoomInformation(
     room: com.example.campus360.data.Room,
     onNavigateFromLocation: () -> Unit,
