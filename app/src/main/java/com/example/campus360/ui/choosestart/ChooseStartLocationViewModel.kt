@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+
 sealed class ChooseStartLocationUiState {
     object Idle : ChooseStartLocationUiState()
     data class NavigateToMap(val roomId: String, val startNodeId: String) : ChooseStartLocationUiState()
