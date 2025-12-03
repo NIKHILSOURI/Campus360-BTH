@@ -28,7 +28,7 @@ class CategoryResultsViewModel(application: Application) : AndroidViewModel(appl
     fun loadCategoryRooms(category: String) {
         viewModelScope.launch {
             _uiState.value = CategoryResultsUiState.Loading
-            // Ensure data is loaded
+            
             if (!repository.isDataLoaded()) {
                 repository.loadAllAssets()
             }
