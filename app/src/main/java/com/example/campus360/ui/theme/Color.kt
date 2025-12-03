@@ -2,6 +2,13 @@ package com.example.campus360.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+
+val PrimaryBlue = Color(0xFF2b6cee)
+
+
+val BackgroundLight = Color(0xFFf6f6f8)
+val BackgroundDark = Color(0xFF101622)
+
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)
