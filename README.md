@@ -33,15 +33,15 @@ Use
 [ ] for not implemented
 [x] for implemented.
 
-[ ] US1
+[x] US1
 
-[ ] US2
+[x] US2
 
-[ ] US3
+[x] US3
 
-[ ] US4
+[x] US4
 
-[ ] US5
+[x] US5
 
 [ ] US6
 
