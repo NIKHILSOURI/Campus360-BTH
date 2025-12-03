@@ -14,7 +14,7 @@ class MapRepository(private val context: Context) {
     
     private var _mapInfo: MapInfo? = null
     private var _rooms: List<Room>? = null
-    private var _roomsById: Map<String, Room> = emptyMap() // Fast O(1) lookup
+    private var _roomsById: Map<String, Room> = emptyMap()
     private var _graph: Graph? = null
     private var _nodesById: Map<String, Node> = emptyMap() 
     private var _floorplanBitmap: Bitmap? = null
@@ -189,7 +189,7 @@ class MapRepository(private val context: Context) {
 
             val decodeOptions = BitmapFactory.Options().apply {
                 inSampleSize = sampleSize
-                inPreferredConfig = Bitmap.Config.RGB_565 // Use less memory
+                inPreferredConfig = Bitmap.Config.RGB_565
             }
             
             val newInputStream = context.assets.open(fileName)

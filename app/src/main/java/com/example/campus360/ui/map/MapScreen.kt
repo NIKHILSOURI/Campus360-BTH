@@ -107,7 +107,6 @@ fun MapScreen(
                                 restoreState = true
                             }
                             Screen.Map.route -> {
-                                // Already on Map screen, do nothing
                             }
                             Screen.Search.route -> navController.navigate("${Screen.Search.route}?query=") {
                                 popUpTo(navController.graph.startDestinationId) {
@@ -262,11 +261,9 @@ fun MapScreen(
                         }
                     }
                     
-                    // Bottom Controls (zoom, recenter)
                     if (!pickMode) {
                         BottomControls(
                             onRecenter = {
-                                // Trigger recenter - this will reset the map to show the route/destination
                                 viewModel.recenterMap()
                             },
                             onZoomIn = {

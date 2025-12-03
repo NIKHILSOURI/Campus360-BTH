@@ -54,7 +54,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun loadRecentDestinations() {
         viewModelScope.launch {
             try {
-                // Ensure data is loaded
                 if (!repository.isDataLoaded()) {
                     repository.loadAllAssets()
                 }
