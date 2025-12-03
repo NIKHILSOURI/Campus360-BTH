@@ -389,7 +389,7 @@ private fun NavigationStepsPanel(
                     }
                 }
                 Icon(
-                    imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = if (isExpanded) "Hide Steps" else "Show Steps",
                     tint = Color.White
                 )
@@ -537,11 +537,11 @@ private fun NavigationStepItem(
                 NavigationDirection.STRAIGHT -> Icons.AutoMirrored.Filled.ArrowForward
                 NavigationDirection.LEFT -> Icons.AutoMirrored.Filled.ArrowBack
                 NavigationDirection.RIGHT -> Icons.AutoMirrored.Filled.ArrowForward
-                NavigationDirection.SLIGHT_LEFT -> Icons.Default.Navigation
-                NavigationDirection.SLIGHT_RIGHT -> Icons.Default.Navigation
+                NavigationDirection.SLIGHT_LEFT -> Icons.Default.Place
+                NavigationDirection.SLIGHT_RIGHT -> Icons.Default.Place
                 NavigationDirection.SHARP_LEFT -> Icons.AutoMirrored.Filled.ArrowBack
                 NavigationDirection.SHARP_RIGHT -> Icons.AutoMirrored.Filled.ArrowForward
-                NavigationDirection.ARRIVE -> Icons.Default.Flag
+                NavigationDirection.ARRIVE -> Icons.Default.Place
             }
             
             
@@ -607,7 +607,7 @@ private fun BottomControls(
             elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.MyLocation,
+                imageVector = Icons.Default.LocationOn,
                 contentDescription = "Recenter",
                 tint = PrimaryBlue,
                 modifier = Modifier.size(24.dp)
@@ -637,7 +637,7 @@ private fun BottomControls(
             elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.Remove,
+                imageVector = Icons.Default.Close,
                 contentDescription = "Zoom Out",
                 tint = PrimaryBlue,
                 modifier = Modifier.size(24.dp)
