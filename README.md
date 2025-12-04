@@ -1,5 +1,7 @@
 # Campus360
 
+[![Android CI](https://github.com/bth-dipt-pa1469/h25-team21-campus360/actions/workflows/android.yml/badge.svg)](https://github.com/bth-dipt-pa1469/h25-team21-campus360/actions/workflows/android.yml)
+
 ## Introduction
 Campus360 is an Android app that helps students and visitors navigate the university campus. It provides indoor floor maps, searchable rooms and points of interest, category browsing, and turn-by-turn visual guidance powered by an A* routing engine over a bidirectional graph.
 
