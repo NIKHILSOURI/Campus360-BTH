@@ -1,5 +1,4 @@
 package com.example.campus360.ui.map
-
 import android.app.Application
 import android.graphics.Bitmap
 import androidx.lifecycle.AndroidViewModel
