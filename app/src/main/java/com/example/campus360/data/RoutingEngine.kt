@@ -2,14 +2,6 @@ package com.example.campus360.data
 
 import kotlin.math.*
 
-/**
- * RoutingEngine implements A* pathfinding algorithm for navigation.
- * 
- * References:
- * - A* Search Algorithm: Hart, P. E., Nilsson, N. J., & Raphael, B. (1968).
- *   A Formal Basis for the Heuristic Determination of Minimum Cost Paths.
- *   IEEE Transactions on Systems Science and Cybernetics, 4(2), 100-107.
- */
 class RoutingEngine(private val graph: Graph) {
     
     data class PathNode(

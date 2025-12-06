@@ -189,7 +189,7 @@ class MapRepository(private val context: Context) {
 
             val decodeOptions = BitmapFactory.Options().apply {
                 inSampleSize = sampleSize
-                inPreferredConfig = Bitmap.Config.RGB_565 // Use less memory
+                inPreferredConfig = Bitmap.Config.RGB_565
             }
             
             val newInputStream = context.assets.open(fileName)

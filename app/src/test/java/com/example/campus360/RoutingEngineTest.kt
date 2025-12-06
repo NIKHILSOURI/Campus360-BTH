@@ -4,20 +4,16 @@ import com.example.campus360.data.*
 import org.junit.Test
 import org.junit.Assert.*
 
-/**
- * Tests for RoutingEngine functionality including exit node identification
- */
 class RoutingEngineTest {
     
     @Test
     fun testGetExitNodes() {
-        // Create a simple graph with nodes on boundaries
         val nodes = listOf(
-            Node("node_top", 10.0, 3.0),      // Top boundary (y <= 5.0)
-            Node("node_right", 1396.0, 100.0), // Right boundary (x >= 1395.0)
-            Node("node_bottom", 100.0, 1096.0), // Bottom boundary (y >= 1095.0)
-            Node("node_left", 3.0, 100.0),     // Left boundary (x <= 5.0)
-            Node("node_center", 700.0, 550.0)  // Center (not an exit)
+            Node("node_top", 10.0, 3.0),
+            Node("node_right", 1396.0, 100.0),
+            Node("node_bottom", 100.0, 1096.0),
+            Node("node_left", 3.0, 100.0),
+            Node("node_center", 700.0, 550.0)
         )
         
         val edges = listOf<Edge>()
@@ -36,12 +32,11 @@ class RoutingEngineTest {
     
     @Test
     fun testFindNearestExitNode() {
-        // Create a graph with a path from start to exit
         val nodes = listOf(
             Node("start", 100.0, 100.0),
             Node("middle", 200.0, 100.0),
-            Node("exit1", 5.0, 100.0),      // Left exit
-            Node("exit2", 1395.0, 100.0)    // Right exit (farther)
+            Node("exit1", 5.0, 100.0),
+            Node("exit2", 1395.0, 100.0)
         )
         
         val edges = listOf(
@@ -90,7 +85,7 @@ class RoutingEngineTest {
             Node("end", 20.0, 20.0)
         )
         
-        val edges = listOf<Edge>() // No edges
+        val edges = listOf<Edge>()
         
         val graph = Graph(nodes, edges)
         val engine = RoutingEngine(graph)
