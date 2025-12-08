@@ -5,3 +5,4 @@ data class Graph(
     val edges: List<Edge>
 )
 
+
