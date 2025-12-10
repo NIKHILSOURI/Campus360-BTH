@@ -1,4 +1,5 @@
 package com.example.campus360.ui.destination
+
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
