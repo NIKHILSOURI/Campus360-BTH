@@ -1,4 +1,5 @@
 package com.example.campus360.ui.destination
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
