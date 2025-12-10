@@ -10,7 +10,7 @@ class PreferencesManager(context: Context) {
         PREFS_NAME,
         Context.MODE_PRIVATE
     )
-    private val gson = Gson()
+    private val gson = Gson() 
     
     companion object {
         private const val PREFS_NAME = "campus360_prefs"
