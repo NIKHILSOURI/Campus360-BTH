@@ -26,6 +26,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.campus360.navigation.Screen
 import com.example.campus360.ui.theme.PrimaryBlue
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DestinationDetailsScreen(
