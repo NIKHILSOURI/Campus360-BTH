@@ -9,3 +9,4 @@ data class MapInfoJson(
     val map_info: MapInfo
 )
 
+
