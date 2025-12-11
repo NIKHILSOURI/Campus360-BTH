@@ -3,14 +3,14 @@ package com.example.campus360.util
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.google.gson.reflect.TypeToken 
 
 class PreferencesManager(context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences(
         PREFS_NAME,
         Context.MODE_PRIVATE
     )
-    private val gson = Gson()
+    private val gson = Gson() 
     
     companion object {
         private const val PREFS_NAME = "campus360_prefs"
