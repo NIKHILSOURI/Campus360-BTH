@@ -5,7 +5,8 @@
 ## Introduction
 Campus360 is an Android app that helps students and visitors navigate the university campus. It provides indoor floor maps, searchable rooms and points of interest, category browsing, and turn-by-turn visual guidance powered by an A* routing engine over a bidirectional graph.
 
-TODO: Add one or more screenshots of the app, when you finalized the UI.  - To be upadated in future
+Below are screenshots demonstrating the finalized user interface and core navigation features of Campus360.
+![Splash Screen](https://github.com/user-attachments/assets/e02b5962-2840-4f24-b77d-5d06cbf4aacb)
 
 ## Architecture Overview
 
@@ -45,14 +46,20 @@ Use
 
 [x] US5
 
-[ ] US6
+[x] US6
 
-[ ] US7
+[x] US7
 
-[ ] US8
+[x] US8
 
 ## How to Use
-  To be upadated in future
+
+1. Open the app and select your start location.
+2. Search for a room or browse categories.
+3. View destination details and choose “Route”.
+4. Follow the visual navigation path on the map.
+5. Use the SOS button to find the nearest exit in emergencies.
+
 ### Build
 
 Using Gradle (from project root):
