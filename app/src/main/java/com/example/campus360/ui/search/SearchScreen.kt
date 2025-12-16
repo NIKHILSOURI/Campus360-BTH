@@ -253,7 +253,7 @@ private fun RoomResultItem(
                     "electronics" -> Icons.Default.Phone
                     "convenience" -> Icons.Default.ShoppingCart
                     "toilet", "restroom" -> Icons.Default.Info
-                    "sports" -> Icons.Default.Sports
+                    "sports" -> Icons.Default.Star
                     "beauty" -> Icons.Default.Favorite
                     "lifestyle" -> Icons.Default.Star
                     "retail" -> Icons.Default.ShoppingCart
@@ -261,7 +261,7 @@ private fun RoomResultItem(
                     "lecture", "lecture_hall" -> Icons.Default.PlayArrow
                     "lab", "laboratory" -> Icons.Default.Build
                     "conference", "conference_room" -> Icons.Default.PlayArrow
-                    "classroom", "class" -> Icons.AutoMirrored.Filled.MenuBook
+                    "classroom", "class" -> Icons.Default.Menu
                     else -> Icons.Default.LocationOn
                 }
                 

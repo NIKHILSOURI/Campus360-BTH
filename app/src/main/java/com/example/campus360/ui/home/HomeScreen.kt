@@ -1,5 +1,4 @@
 package com.example.campus360.ui.home
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -187,7 +186,7 @@ private fun Header(onGlobeClick: () -> Unit) {
         
         IconButton(onClick = onGlobeClick) {
             Icon(
-                imageVector = Icons.Default.Language,
+                imageVector = Icons.Default.Settings,
                 contentDescription = "Language",
                 tint = Color(0xFF0D121B),
                 modifier = Modifier.size(24.dp)
@@ -283,9 +282,9 @@ private fun CategoryButton(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         val icon = when (category.id) {
-            "class" -> Icons.Default.School
-            "lab" -> Icons.Default.Science
-            "hall" -> Icons.Default.MeetingRoom
+            "class" -> Icons.Default.Menu
+            "lab" -> Icons.Default.Build
+            "hall" -> Icons.Default.Home
             "popular" -> Icons.Default.Star
             else -> Icons.Default.LocationOn
         }

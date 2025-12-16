@@ -1,5 +1,4 @@
 package com.example.campus360.ui.home
-
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -54,7 +53,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun loadRecentDestinations() {
         viewModelScope.launch {
             try {
-                // Ensure data is loaded
                 if (!repository.isDataLoaded()) {
                     repository.loadAllAssets()
                 }

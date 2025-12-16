@@ -11,7 +11,6 @@ import com.example.campus360.ui.category.CategoryResultsScreen
 import com.example.campus360.ui.choosestart.ChooseStartLocationScreen
 import com.example.campus360.ui.destination.DestinationDetailsScreen
 import com.example.campus360.ui.home.HomeScreen
-import com.example.campus360.ui.language.LanguageSelectionScreen
 import com.example.campus360.ui.map.MapScreen
 import com.example.campus360.ui.search.SearchScreen
 import com.example.campus360.ui.settings.SettingsScreen
