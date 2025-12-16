@@ -11,8 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch 
-
-
+ 
 sealed class DestinationDetailsUiState {
     object Loading : DestinationDetailsUiState()
     data class Success(val room: Room) : DestinationDetailsUiState()
