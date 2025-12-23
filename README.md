@@ -10,8 +10,7 @@ Below are screenshots demonstrating the finalized user interface and core naviga
 
 ## Architecture Overview
 
-![Architecture](https://github.com/user-attachments/assets/8932ea39-3464-4ca6-b601-f77ac09c419c)
-
+<img width="3608" height="1176" alt="Architecture new" src="https://github.com/user-attachments/assets/45e639c0-9cdd-41f0-a97f-4bbf2d05403b" />
 
 
 ## User Stories
