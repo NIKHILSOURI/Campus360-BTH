@@ -14,6 +14,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import com.example.campus360.R
 import com.example.campus360.navigation.Screen
 import com.example.campus360.ui.theme.PrimaryBlue
 
@@ -35,6 +37,7 @@ fun BottomNavigationBar(
                 thickness = 1.dp
             )
             
+            val context = LocalContext.current
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -44,28 +47,28 @@ fun BottomNavigationBar(
             ) {
                 BottomNavItem(
                     icon = Icons.Default.Home,
-                    label = "Home",
+                    label = context.getString(R.string.home),
                     isSelected = currentRoute == Screen.Home.route,
                     onClick = { onNavigate(Screen.Home.route) }
                 )
                 
                 BottomNavItem(
                     icon = Icons.Default.Place,
-                    label = "Map",
+                    label = context.getString(R.string.map),
                     isSelected = currentRoute == Screen.Map.route || currentRoute.startsWith(Screen.Map.route),
                     onClick = { onNavigate(Screen.Map.route) }
                 )
                 
                 BottomNavItem(
                     icon = Icons.Outlined.Search,
-                    label = "Search",
+                    label = context.getString(R.string.search),
                     isSelected = currentRoute == Screen.Search.route || currentRoute.startsWith(Screen.Search.route),
                     onClick = { onNavigate(Screen.Search.route) }
                 )
                 
                 BottomNavItem(
                     icon = Icons.Outlined.Settings,
-                    label = "Settings",
+                    label = context.getString(R.string.settings),
                     isSelected = currentRoute == Screen.Settings.route,
                     onClick = { onNavigate(Screen.Settings.route) }
                 )

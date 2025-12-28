@@ -1,4 +1,5 @@
 package com.example.campus360.ui.settings
+
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,7 +8,7 @@ import com.example.campus360.util.PreferencesManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch 
+import kotlinx.coroutines.launch
 
 data class SettingsState(
     val selectedLanguage: String? = null,
