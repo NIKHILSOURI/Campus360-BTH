@@ -6,3 +6,4 @@ data class Edge(
     val weight: Double = 1.0
 )
 
+

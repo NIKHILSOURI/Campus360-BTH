@@ -14,7 +14,7 @@ class MapRepository(private val context: Context) {
     
     private var _mapInfo: MapInfo? = null
     private var _rooms: List<Room>? = null
-    private var _roomsById: Map<String, Room> = emptyMap()
+    private var _roomsById: Map<String, Room> = emptyMap() 
     private var _graph: Graph? = null
     private var _nodesById: Map<String, Node> = emptyMap() 
     private var _floorplanBitmap: Bitmap? = null

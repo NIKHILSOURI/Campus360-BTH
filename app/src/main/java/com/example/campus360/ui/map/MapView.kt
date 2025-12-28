@@ -1,5 +1,4 @@
 package com.example.campus360.ui.map
-
 import android.graphics.Bitmap
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.*
