@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.ui.platform.LocalContext
+import com.example.campus360.R
 import com.example.campus360.data.Room
 import com.example.campus360.navigation.Screen
 import com.example.campus360.ui.theme.PrimaryBlue
@@ -56,9 +58,10 @@ fun CategoryResultsScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                        val context = LocalContext.current
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = context.getString(R.string.back)
                         )
                     }
                 },
@@ -116,8 +119,9 @@ fun CategoryResultsScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
+                    val context = LocalContext.current
                     Text(
-                        text = "No rooms found in this category",
+                        text = context.getString(R.string.no_rooms_found),
                         fontSize = 16.sp,
                         color = Color.Gray
                     )
@@ -216,9 +220,10 @@ private fun RoomItem(
             }
             
             
+            val context = LocalContext.current
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Navigate",
+                contentDescription = context.getString(R.string.navigate),
                 tint = Color(0xFF4C669A),
                 modifier = Modifier.size(20.dp)
             )

@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.compose.ui.platform.LocalContext
+import com.example.campus360.R
 import com.example.campus360.navigation.Screen
 import com.example.campus360.ui.theme.PrimaryBlue
 
@@ -85,17 +87,19 @@ private fun SplashScreenContent(
                         .background(PrimaryBlue),
                     contentAlignment = Alignment.Center
                 ) {
+                    val context = LocalContext.current
                     Icon(
                         imageVector = Icons.Default.LocationOn,
-                        contentDescription = "Campus360 Logo",
+                        contentDescription = context.getString(R.string.campus360_logo),
                         tint = Color.White,
                         modifier = Modifier.size(32.dp)
                     )
                 }
                 
                 
+                val context = LocalContext.current
                 Text(
-                    text = "Campus360",
+                    text = context.getString(R.string.app_name),
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -130,8 +134,9 @@ private fun SplashScreenContent(
                 }
                 
                 
+                val context = LocalContext.current
                 Text(
-                    text = "Navigating your space",
+                    text = context.getString(R.string.navigating_your_space),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)

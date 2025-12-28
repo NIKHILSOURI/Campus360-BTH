@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.ui.platform.LocalContext
+import com.example.campus360.R
 import com.example.campus360.data.Room
 import com.example.campus360.navigation.Screen
 import com.example.campus360.ui.theme.PrimaryBlue
@@ -113,8 +115,9 @@ fun SearchScreen(
                     .weight(1f)
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
+                val context = LocalContext.current
                 Text(
-                    text = "Recent Searches",
+                    text = context.getString(R.string.recent_searches),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(0xFF4C669A),
@@ -149,8 +152,9 @@ private fun Header() {
     ) {
         Spacer(modifier = Modifier.size(48.dp))
         
+        val context = LocalContext.current
         Text(
-            text = "Find a Room",
+            text = context.getString(R.string.find_a_room),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF0D121B),
@@ -182,9 +186,10 @@ private fun SearchBar(
                 .padding(start = 14.dp, end = 16.dp), 
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val context = LocalContext.current
             Icon(
                 imageVector = Icons.Default.Search,
-                contentDescription = "Search",
+                contentDescription = context.getString(R.string.search_icon),
                 tint = Color(0xFF4C669A),
                 modifier = Modifier.size(24.dp)
             )
@@ -196,7 +201,7 @@ private fun SearchBar(
                 onValueChange = onQueryChange,
                 placeholder = {
                     Text(
-                        text = "Search by name or room number...",
+                        text = context.getString(R.string.search_by_name),
                         color = Color(0xFFA0A4A8), 
                         fontSize = 15.5.sp 
                     )
@@ -301,9 +306,10 @@ private fun RoomResultItem(
             }
             
             
+            val context = LocalContext.current
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Navigate",
+                contentDescription = context.getString(R.string.navigate),
                 tint = Color(0xFF4C669A),
                 modifier = Modifier.size(20.dp)
             )

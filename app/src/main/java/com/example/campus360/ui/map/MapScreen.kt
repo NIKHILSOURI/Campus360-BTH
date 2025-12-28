@@ -31,6 +31,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.ui.platform.LocalContext
+import com.example.campus360.R
 import com.example.campus360.data.NavigationDirection
 import com.example.campus360.data.NavigationStep
 import com.example.campus360.navigation.Screen
@@ -216,8 +218,9 @@ fun MapScreen(
                             shape = RoundedCornerShape(12.dp),
                             color = if (sosMode) Color(0xFFDC3545).copy(alpha = 0.9f) else PrimaryBlue.copy(alpha = 0.9f)
                         ) {
+                            val context = LocalContext.current
                             Text(
-                                text = if (sosMode) "Tap on the map to select your current location for emergency exit route" else "Tap on the map to select your starting location",
+                                text = if (sosMode) context.getString(R.string.tap_to_select_sos) else context.getString(R.string.tap_to_select_start),
                                 color = Color.White,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
@@ -291,8 +294,9 @@ fun MapScreen(
                                 text = state.message,
                                 color = MaterialTheme.colorScheme.error
                             )
+                            val context = LocalContext.current
                             Button(onClick = { navController.popBackStack() }) {
-                                Text("Go Back")
+                                Text(context.getString(R.string.go_back))
                             }
                         }
                     }
@@ -321,9 +325,10 @@ private fun TopControls(
             containerColor = Color.White,
             elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp)
         ) {
+            val context = LocalContext.current
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = context.getString(R.string.back),
                 tint = Color(0xFF0D121B),
                 modifier = Modifier.size(24.dp)
             )
@@ -433,8 +438,9 @@ private fun EmergencyRouteLabel(
         color = if (isRouteUnavailable) Color(0xFFFF5252) else Color(0xFFFF9800),
         tonalElevation = 4.dp
     ) {
+        val context = LocalContext.current
         Text(
-            text = if (isRouteUnavailable) "No emergency exit route found" else "Emergency route to nearest exit",
+            text = if (isRouteUnavailable) context.getString(R.string.no_emergency_route) else context.getString(R.string.emergency_route),
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
@@ -465,21 +471,22 @@ private fun RouteUnavailableMessage(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                val context = LocalContext.current
                 Icon(
                     imageVector = Icons.Default.Warning,
-                    contentDescription = "Warning",
+                    contentDescription = context.getString(R.string.warning),
                     tint = Color(0xFFFF9800),
                     modifier = Modifier.size(48.dp)
                 )
                 Text(
-                    text = "No directions found",
+                    text = context.getString(R.string.no_directions),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF0D121B),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
                 Text(
-                    text = "We couldn't find a route to this destination.",
+                    text = context.getString(R.string.no_route_message),
                     fontSize = 14.sp,
                     color = Color(0xFF4C669A),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -574,8 +581,9 @@ private fun NavigationStepItem(
                     color = if (isCurrent) Color(0xFF0D121B) else Color(0xFF4C669A)
                 )
                 if (step.distance > 0) {
+                    val context = LocalContext.current
                     Text(
-                        text = String.format("%.1f units", step.distance),
+                        text = String.format("%.1f %s", step.distance, context.getString(R.string.units)),
                         fontSize = 12.sp,
                         color = Color(0xFF4C669A).copy(alpha = 0.7f)
                     )
@@ -603,9 +611,10 @@ private fun BottomControls(
             containerColor = Color.White,
             elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp)
         ) {
+            val context = LocalContext.current
             Icon(
                 imageVector = Icons.Default.LocationOn,
-                contentDescription = "Recenter",
+                contentDescription = context.getString(R.string.recenter),
                 tint = PrimaryBlue,
                 modifier = Modifier.size(24.dp)
             )
@@ -618,9 +627,10 @@ private fun BottomControls(
             containerColor = Color.White,
             elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp)
         ) {
+            val context = LocalContext.current
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "Zoom In",
+                contentDescription = context.getString(R.string.zoom_in),
                 tint = PrimaryBlue,
                 modifier = Modifier.size(24.dp)
             )
@@ -633,9 +643,10 @@ private fun BottomControls(
             containerColor = Color.White,
             elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp)
         ) {
+            val context = LocalContext.current
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Zoom Out",
+                contentDescription = context.getString(R.string.zoom_out),
                 tint = PrimaryBlue,
                 modifier = Modifier.size(24.dp)
             )
