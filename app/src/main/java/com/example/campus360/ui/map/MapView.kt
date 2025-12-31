@@ -19,6 +19,18 @@ import com.example.campus360.data.Route
 import com.example.campus360.ui.theme.PrimaryBlue
 import kotlin.math.*
 
+data class MapRenderInfo(
+    val containerWidth: Float,
+    val containerHeight: Float,
+    val mapImageNaturalWidth: Float,
+    val mapImageNaturalHeight: Float,
+    val renderedMapWidth: Float,
+    val renderedMapHeight: Float,
+    val offsetX: Float,
+    val offsetY: Float,
+    val contentScale: Float
+)
+
 @Composable
 fun MapView(
     bitmap: Bitmap?,
@@ -34,7 +46,8 @@ fun MapView(
     onTranslateChange: (Float, Float) -> Unit = { _, _ -> },
     onMapClick: ((Double, Double) -> Unit)? = null,
     modifier: Modifier = Modifier,
-    selectedBuilding: String = "J"
+    selectedBuilding: String = "J",
+    focusTarget: Pair<Double, Double>? = null
 ) {
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
     var internalScale by remember { mutableStateOf(scale) }
@@ -45,6 +58,7 @@ fun MapView(
     var lastDestinationNode by remember { mutableStateOf<Node?>(null) }
     var lastRecenterTrigger by remember { mutableStateOf(0) }
     var interactionEndTime by remember { mutableStateOf(0L) }
+    var mapRenderInfo by remember { mutableStateOf<MapRenderInfo?>(null) }
     
     LaunchedEffect(scale, translateX, translateY) {
         // Always sync when scale changes (zoom buttons), but respect user interaction for pan
@@ -56,6 +70,43 @@ fun MapView(
         }
     }
     
+    fun computeMapRenderInfo(
+        containerWidth: Float,
+        containerHeight: Float,
+        mapWidth: Float,
+        mapHeight: Float
+    ): MapRenderInfo {
+        if (mapWidth <= 0 || mapHeight <= 0) {
+            return MapRenderInfo(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 1f)
+        }
+        val scaleX = containerWidth / mapWidth
+        val scaleY = containerHeight / mapHeight
+        val contentScale = min(scaleX, scaleY)
+        val renderedMapWidth = mapWidth * contentScale
+        val renderedMapHeight = mapHeight * contentScale
+        val offsetX = (containerWidth - renderedMapWidth) / 2
+        val offsetY = (containerHeight - renderedMapHeight) / 2
+        return MapRenderInfo(
+            containerWidth, containerHeight,
+            mapWidth, mapHeight,
+            renderedMapWidth, renderedMapHeight,
+            offsetX, offsetY,
+            contentScale
+        )
+    }
+
+    fun worldToScreen(worldX: Double, worldY: Double, renderInfo: MapRenderInfo, currentScale: Float, currentOffsetX: Float, currentOffsetY: Float): Offset {
+        val screenX = (worldX.toFloat() * currentScale) + currentOffsetX
+        val screenY = (worldY.toFloat() * currentScale) + currentOffsetY
+        return Offset(screenX, screenY)
+    }
+
+    fun screenToWorld(screenX: Float, screenY: Float, renderInfo: MapRenderInfo, currentScale: Float, currentOffsetX: Float, currentOffsetY: Float): Pair<Double, Double> {
+        val worldX = (screenX - currentOffsetX) / currentScale
+        val worldY = (screenY - currentOffsetY) / currentScale
+        return Pair(worldX.toDouble(), worldY.toDouble())
+    }
+
     LaunchedEffect(bitmap, mapInfo, canvasSize) {
         if (bitmap != null && mapInfo != null && canvasSize.width > 0 && canvasSize.height > 0 && !isUserInteracting) {
             val mapWidth = mapInfo.width.toFloat()
@@ -64,13 +115,13 @@ fun MapView(
             val canvasHeight = canvasSize.height.toFloat()
             
             if (mapWidth > 0 && mapHeight > 0) {
-                val scaleX = canvasWidth / mapWidth
-                val scaleY = canvasHeight / mapHeight
-                val fitScale = min(scaleX, scaleY) * 0.9f
+                val renderInfo = computeMapRenderInfo(canvasWidth, canvasHeight, mapWidth, mapHeight)
+                mapRenderInfo = renderInfo
+                val fitScale = renderInfo.contentScale * 0.9f
                 
                 internalScale = fitScale
-                internalOffsetX = (canvasWidth - mapWidth * fitScale) / 2
-                internalOffsetY = (canvasHeight - mapHeight * fitScale) / 2
+                internalOffsetX = renderInfo.offsetX
+                internalOffsetY = renderInfo.offsetY
                 onScaleChange(fitScale)
                 onTranslateChange(internalOffsetX, internalOffsetY)
             }
@@ -145,7 +196,7 @@ fun MapView(
         }
     }
     
-    LaunchedEffect(recenterTrigger) {
+    LaunchedEffect(recenterTrigger, destinationNode, scale, focusTarget) {
         if (recenterTrigger > lastRecenterTrigger && bitmap != null && mapInfo != null && canvasSize.width > 0 && canvasSize.height > 0) {
             val newRecenterTrigger = recenterTrigger
             lastRecenterTrigger = newRecenterTrigger
@@ -161,11 +212,29 @@ fun MapView(
                 return@LaunchedEffect
             }
             
-            val scaleX = canvasWidth / mapWidth
-            val scaleY = canvasHeight / mapHeight
-            val fitScale = min(scaleX, scaleY) * 0.9f
+            val renderInfo = computeMapRenderInfo(canvasWidth, canvasHeight, mapWidth, mapHeight)
+            mapRenderInfo = renderInfo
+            val fitScale = renderInfo.contentScale * 0.9f
             
-            if (route != null && route.nodes.isNotEmpty()) {
+            if (focusTarget != null) {
+                val targetX = focusTarget.first
+                val targetY = focusTarget.second
+                val targetScale = (fitScale * 1.5f).coerceIn(0.5f, 5f)
+                internalScale = targetScale
+                internalOffsetX = canvasWidth / 2 - (targetX * targetScale).toFloat()
+                internalOffsetY = canvasHeight / 2 - (targetY * targetScale).toFloat()
+                onScaleChange(targetScale)
+                onTranslateChange(internalOffsetX, internalOffsetY)
+            } else if (destinationNode != null && scale > 1f) {
+                val targetX = destinationNode.x.toFloat()
+                val targetY = destinationNode.y.toFloat()
+                val targetScale = scale.coerceIn(0.5f, 5f)
+                internalScale = targetScale
+                internalOffsetX = canvasWidth / 2 - targetX * targetScale
+                internalOffsetY = canvasHeight / 2 - targetY * targetScale
+                onScaleChange(targetScale)
+                onTranslateChange(internalOffsetX, internalOffsetY)
+            } else if (route != null && route.nodes.isNotEmpty()) {
                 val nodes = route.nodes
                 val minX = nodes.minOfOrNull { it.x } ?: 0.0
                 val minY = nodes.minOfOrNull { it.y } ?: 0.0
@@ -190,8 +259,8 @@ fun MapView(
                     onTranslateChange(internalOffsetX, internalOffsetY)
                 } else {
                     internalScale = fitScale
-                    internalOffsetX = (canvasWidth - mapWidth * fitScale) / 2
-                    internalOffsetY = (canvasHeight - mapHeight * fitScale) / 2
+                    internalOffsetX = renderInfo.offsetX
+                    internalOffsetY = renderInfo.offsetY
                     onScaleChange(fitScale)
                     onTranslateChange(internalOffsetX, internalOffsetY)
                 }
@@ -204,8 +273,8 @@ fun MapView(
                 onTranslateChange(internalOffsetX, internalOffsetY)
             } else {
                 internalScale = fitScale
-                internalOffsetX = (canvasWidth - mapWidth * fitScale) / 2
-                internalOffsetY = (canvasHeight - mapHeight * fitScale) / 2
+                internalOffsetX = renderInfo.offsetX
+                internalOffsetY = renderInfo.offsetY
                 onScaleChange(fitScale)
                 onTranslateChange(internalOffsetX, internalOffsetY)
             }
@@ -214,10 +283,16 @@ fun MapView(
     
     val clickGesture = Modifier.pointerInput(Unit) {
         detectTapGestures { offset ->
-            onMapClick?.invoke(
-                ((offset.x - internalOffsetX) / internalScale).toDouble(),
-                ((offset.y - internalOffsetY) / internalScale).toDouble()
-            )
+            val renderInfo = mapRenderInfo
+            if (renderInfo != null) {
+                val world = screenToWorld(offset.x, offset.y, renderInfo, internalScale, internalOffsetX, internalOffsetY)
+                onMapClick?.invoke(world.first, world.second)
+            } else {
+                onMapClick?.invoke(
+                    ((offset.x - internalOffsetX) / internalScale).toDouble(),
+                    ((offset.y - internalOffsetY) / internalScale).toDouble()
+                )
+            }
         }
     }
     
@@ -283,11 +358,16 @@ fun MapView(
             route?.let { route ->
                 if (route.nodes.size > 1) {
                     val path = Path()
+                    val renderInfo = mapRenderInfo
                     val nodePositions = route.nodes.map { node ->
-                        Offset(
-                            node.x.toFloat() * internalScale + internalOffsetX,
-                            node.y.toFloat() * internalScale + internalOffsetY
-                        )
+                        if (renderInfo != null) {
+                            worldToScreen(node.x, node.y, renderInfo, internalScale, internalOffsetX, internalOffsetY)
+                        } else {
+                            Offset(
+                                node.x.toFloat() * internalScale + internalOffsetX,
+                                node.y.toFloat() * internalScale + internalOffsetY
+                            )
+                        }
                     }
                     
                     nodePositions.forEachIndexed { index, offset ->
@@ -358,8 +438,17 @@ fun MapView(
             }
             
             startNode?.let { node ->
-                val x = node.x.toFloat() * internalScale + internalOffsetX
-                val y = node.y.toFloat() * internalScale + internalOffsetY
+                val renderInfo = mapRenderInfo
+                val screenPos = if (renderInfo != null) {
+                    worldToScreen(node.x, node.y, renderInfo, internalScale, internalOffsetX, internalOffsetY)
+                } else {
+                    Offset(
+                        node.x.toFloat() * internalScale + internalOffsetX,
+                        node.y.toFloat() * internalScale + internalOffsetY
+                    )
+                }
+                val x = screenPos.x
+                val y = screenPos.y
                 val markerRadius = 20f * internalScale.coerceIn(0.5f, 2f)
                 
                 drawCircle(
@@ -392,8 +481,17 @@ fun MapView(
             }
             
             destinationNode?.let { node ->
-                val x = node.x.toFloat() * internalScale + internalOffsetX
-                val y = node.y.toFloat() * internalScale + internalOffsetY
+                val renderInfo = mapRenderInfo
+                val screenPos = if (renderInfo != null) {
+                    worldToScreen(node.x, node.y, renderInfo, internalScale, internalOffsetX, internalOffsetY)
+                } else {
+                    Offset(
+                        node.x.toFloat() * internalScale + internalOffsetX,
+                        node.y.toFloat() * internalScale + internalOffsetY
+                    )
+                }
+                val x = screenPos.x
+                val y = screenPos.y
                 val markerRadius = 22f * internalScale.coerceIn(0.5f, 2f)
                 
                 drawCircle(
