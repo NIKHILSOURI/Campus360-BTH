@@ -5,6 +5,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -34,6 +36,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.asPaddingValues
 import com.example.campus360.R
 import com.example.campus360.data.NavigationDirection
 import com.example.campus360.data.NavigationStep
@@ -57,30 +63,24 @@ fun MapScreen(
     val recenterTrigger by viewModel.recenterTrigger.collectAsState()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     
-    
     val currentRoomId = remember(roomId) { roomId }
-    
     
     val navigationSteps = mapState.navigationSteps
     val currentStepIndex = mapState.currentStepIndex
     var showStepsPanel by remember { mutableStateOf(false) }
     
-    // Building selector state - sync with ViewModel
     val selectedBuilding = mapState.selectedBuilding
     
     LaunchedEffect(roomId, startNodeId, pickMode, sosMode) {
         Log.d("MapScreen", "MapScreen loaded: roomId=$roomId, startNodeId=$startNodeId, pickMode=$pickMode, sosMode=$sosMode")
         if (sosMode) {
-            
             if (startNodeId.isNotEmpty()) {
                 Log.d("MapScreen", "Loading SOS route: startNodeId=$startNodeId")
                 viewModel.loadSOSRoute(startNodeId)
             } else {
-                
                 Log.d("MapScreen", "startNodeId is empty in SOS mode, enabling location pick")
             }
         } else if (pickMode) {
-            
             if (roomId.isNotEmpty()) {
                 Log.d("MapScreen", "Loading destination only for pick mode: roomId=$roomId")
                 viewModel.loadDestinationOnly(roomId)
@@ -136,7 +136,12 @@ fun MapScreen(
             }
         }
     ) { innerPadding ->
-        Box(
+        val windowInsets = WindowInsets.systemBars
+        val insetsPadding = windowInsets.asPaddingValues()
+        val topPadding = insetsPadding.calculateTopPadding()
+        val bottomPadding = insetsPadding.calculateBottomPadding()
+        
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(0xFFF8F9FC))
@@ -151,228 +156,212 @@ fun MapScreen(
                     }
                 }
                 is MapUiState.Ready -> {
-                    // MapView first (background layer)
-                    // Key MapView by selectedBuilding to force remount when building changes
-                    // Get route for the currently selected building (not just currentSegment)
-                    val routeForCurrentBuilding = viewModel.getRouteForBuilding(selectedBuilding)
-                    key(selectedBuilding) {
-                        MapView(
-                            bitmap = floorplanBitmap,
-                        mapInfo = mapInfo,
-                        route = routeForCurrentBuilding,
-                        destinationNode = mapState.destinationNode,
-                        startNode = mapState.startNode,
-                        recenterTrigger = recenterTrigger,
-                        scale = mapState.scale,
-                        translateX = mapState.translateX,
-                        translateY = mapState.translateY,
-                        selectedBuilding = selectedBuilding,
-                        onScaleChange = { scale ->
-                            viewModel.updateMapState(scale, mapState.translateX, mapState.translateY)
-                        },
-                        onTranslateChange = { tx, ty ->
-                            viewModel.updateMapState(mapState.scale, tx, ty)
-                        },
-                        onMapClick = if (pickMode || (sosMode && startNodeId.isEmpty())) { x, y ->
-                            
-                            try {
-                                Log.d("MapScreen", "Map clicked in ${if (sosMode) "SOS" else "pick"} mode at ($x, $y)")
-                                val node = viewModel.findNearestNode(x, y)
-                                node?.let {
-                                    Log.d("MapScreen", "Node selected: ${it.id} at ($x, $y)")
-                                    if (sosMode) {
-                                        
-                                        Log.d("MapScreen", "Navigating to SOS route: startNodeId=${it.id}")
-                                        navController.navigate("${Screen.Map.route}?roomId=&startNodeId=${it.id}&pickMode=false&sosMode=true") {
-                                            launchSingleTop = true
-                                        }
-                                    } else if (currentRoomId.isNotEmpty()) {
-                                        
-                                        Log.d("MapScreen", "Navigating to map with route: roomId=$currentRoomId, startNodeId=${it.id}")
-                                        navController.navigate("${Screen.Map.route}?roomId=$currentRoomId&startNodeId=${it.id}&pickMode=false&sosMode=false") {
-                                            
-                                            popUpTo(Screen.ChooseStartLocation.route) {
-                                                inclusive = true
-                                            }
-                                            launchSingleTop = true
-                                        }
-                                    } else {
-                                        Log.e("MapScreen", "roomId is empty, cannot navigate")
-                                        navController.popBackStack()
-                                    }
-                                } ?: run {
-                                    Log.e("MapScreen", "No node found at ($x, $y)")
-                                }
-                            } catch (e: Exception) {
-                                Log.e("MapScreen", "Error handling map click", e)
-                            }
-                        } else null,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .zIndex(1f) // MapView in background layer
-                        )
-                    }
-                    
-                    // Building selector - placed AFTER MapView so it's on top and clickable
-                    BuildingSelector(
-                        selectedBuilding = selectedBuilding,
-                        onBuildingSelected = { building ->
-                            android.util.Log.d("MapScreen", "Building selector clicked: $building")
-                            viewModel.switchBuilding(building)
-                        },
-                        modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .padding(top = 72.dp, start = 16.dp, end = 16.dp)
-                            .zIndex(10f) // Ensure it's above map
-                    )
-                    
-                    // Selected building label
                     Surface(
                         modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .padding(top = 130.dp, start = 16.dp, end = 16.dp)
-                            .zIndex(10f),
-                        shape = RoundedCornerShape(8.dp),
-                        color = Color.White.copy(alpha = 0.9f),
+                            .fillMaxWidth()
+                            .padding(top = topPadding),
+                        color = Color(0xFFF8F9FC),
                         tonalElevation = 2.dp
                     ) {
-                        Text(
-                            text = "Selected: Building $selectedBuilding",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFF0D121B),
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-                        )
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            BuildingSelector(
+                                selectedBuilding = selectedBuilding,
+                                onBuildingSelected = { building ->
+                                    android.util.Log.d("MapScreen", "Building selector clicked: $building")
+                                    viewModel.switchBuilding(building)
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
                     
-                    // Cross-building navigation UI
-                    // Show switch button only if:
-                    // 1. There's a cross-building route
-                    // 2. We're viewing the first building (J) and haven't switched yet
-                    val crossRoute = mapState.crossBuildingRoute
-                    val currentSegmentIndex = mapState.currentSegmentIndex
-                    val segmentIndexForBuilding = viewModel.getSegmentIndexForBuilding(selectedBuilding)
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
+                        val routeForCurrentBuilding = viewModel.getRouteForBuilding(selectedBuilding)
+                        key(selectedBuilding) {
+                            MapView(
+                                bitmap = floorplanBitmap,
+                            mapInfo = mapInfo,
+                            route = routeForCurrentBuilding,
+                            destinationNode = mapState.destinationNode,
+                            startNode = mapState.startNode,
+                            recenterTrigger = recenterTrigger,
+                            scale = mapState.scale,
+                            translateX = mapState.translateX,
+                            translateY = mapState.translateY,
+                            selectedBuilding = selectedBuilding,
+                            focusTarget = mapState.focusTarget,
+                            onScaleChange = { scale ->
+                                viewModel.updateMapState(scale, mapState.translateX, mapState.translateY)
+                            },
+                            onTranslateChange = { tx, ty ->
+                                viewModel.updateMapState(mapState.scale, tx, ty)
+                            },
+                            onMapClick = if (pickMode || (sosMode && startNodeId.isEmpty())) { x, y ->
+                                try {
+                                    Log.d("MapScreen", "Map clicked in ${if (sosMode) "SOS" else "pick"} mode at ($x, $y)")
+                                    val node = viewModel.findNearestNode(x, y)
+                                    node?.let {
+                                        Log.d("MapScreen", "Node selected: ${it.id} at ($x, $y)")
+                                        if (sosMode) {
+                                            Log.d("MapScreen", "Navigating to SOS route: startNodeId=${it.id}")
+                                            navController.navigate("${Screen.Map.route}?roomId=&startNodeId=${it.id}&pickMode=false&sosMode=true") {
+                                                launchSingleTop = true
+                                            }
+                                        } else if (currentRoomId.isNotEmpty()) {
+                                            Log.d("MapScreen", "Navigating to map with route: roomId=$currentRoomId, startNodeId=${it.id}")
+                                            navController.navigate("${Screen.Map.route}?roomId=$currentRoomId&startNodeId=${it.id}&pickMode=false&sosMode=false") {
+                                                popUpTo(Screen.ChooseStartLocation.route) {
+                                                    inclusive = true
+                                                }
+                                                launchSingleTop = true
+                                            }
+                                        } else {
+                                            Log.e("MapScreen", "roomId is empty, cannot navigate")
+                                            navController.popBackStack()
+                                        }
+                                    } ?: run {
+                                        Log.e("MapScreen", "No node found at ($x, $y)")
+                                    }
+                                } catch (e: Exception) {
+                                    Log.e("MapScreen", "Error handling map click", e)
+                                }
+                            } else null,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .zIndex(1f)
+                            )
+                        }
                     
-                    // Determine if we should show the switch button
-                    val shouldShowSwitchButton = if (crossRoute != null && segmentIndexForBuilding != null) {
-                        // We're viewing a building that has a segment in the cross-building route
-                        // Show switch button if:
-                        // - We're on the first building (J) and haven't switched yet (currentSegmentIndex == 0)
-                        val isFirstBuilding = segmentIndexForBuilding == 0
-                        val isOnFirstSegment = currentSegmentIndex == 0
-                        
-                        // Show if we're on J (first building) and haven't switched
-                        isFirstBuilding && isOnFirstSegment
-                    } else {
-                        false
-                    }
-                    
-                    if (shouldShowSwitchButton && crossRoute != null) {
-                        val currentSegment = crossRoute.segments.getOrNull(currentSegmentIndex)
-                        val nextSegment = crossRoute.segments.getOrNull(currentSegmentIndex + 1)
-                        val instruction = currentSegment?.instruction ?: nextSegment?.instruction ?: "Continue to next building"
-                        val nextBuildingId = nextSegment?.buildingId ?: ""
-                        
-                        CrossBuildingNavigationBanner(
-                            instruction = instruction,
-                            onContinue = {
-                                android.util.Log.d("MapScreen", "Switch button clicked. Current building: $selectedBuilding, Next building: $nextBuildingId")
-                                viewModel.continueToNextBuildingSegment()
+                        TopControls(
+                            onBackClick = { 
+                                Log.d("MapScreen", "Back button clicked in pickMode=$pickMode")
+                                navController.popBackStack() 
                             },
                             modifier = Modifier
-                                .align(Alignment.TopCenter)
-                                .padding(top = 160.dp, start = 16.dp, end = 16.dp)
+                                .align(Alignment.TopStart)
+                                .padding(8.dp)
                                 .zIndex(10f)
                         )
-                    }
-                    
-                   
-                    TopControls(
-                        onBackClick = { 
-                            Log.d("MapScreen", "Back button clicked in pickMode=$pickMode")
-                            navController.popBackStack() 
-                        },
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .zIndex(10f)
-                    )
-                    
-                    
-                    if (pickMode || (sosMode && startNodeId.isEmpty())) {
-                        Surface(
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .padding(bottom = innerPadding.calculateBottomPadding() + 16.dp, start = 16.dp, end = 16.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            color = if (sosMode) Color(0xFFDC3545).copy(alpha = 0.9f) else PrimaryBlue.copy(alpha = 0.9f)
-                        ) {
-                            val context = LocalContext.current
-                            Text(
-                                text = if (sosMode) context.getString(R.string.tap_to_select_sos) else context.getString(R.string.tap_to_select_start),
-                                color = Color.White,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(16.dp)
+                        
+                        val crossRoute = mapState.crossBuildingRoute
+                        val currentSegmentIndex = mapState.currentSegmentIndex
+                        val segmentIndexForBuilding = viewModel.getSegmentIndexForBuilding(selectedBuilding)
+                        
+                        val shouldShowSwitchButton = if (crossRoute != null && segmentIndexForBuilding != null) {
+                            val isFirstBuilding = segmentIndexForBuilding == 0
+                            val isOnFirstSegment = currentSegmentIndex == 0
+                            isFirstBuilding && isOnFirstSegment
+                        } else {
+                            false
+                        }
+                        
+                        if (shouldShowSwitchButton && crossRoute != null) {
+                            val currentSegment = crossRoute.segments.getOrNull(currentSegmentIndex)
+                            val nextSegment = crossRoute.segments.getOrNull(currentSegmentIndex + 1)
+                            val instruction = currentSegment?.instruction ?: nextSegment?.instruction ?: "Continue to next building"
+                            val nextBuildingId = nextSegment?.buildingId ?: ""
+                            
+                            CrossBuildingNavigationBanner(
+                                instruction = instruction,
+                                onContinue = {
+                                    android.util.Log.d("MapScreen", "Switch button clicked. Current building: $selectedBuilding, Next building: $nextBuildingId")
+                                    viewModel.continueToNextBuildingSegment()
+                                },
+                                modifier = Modifier
+                                    .align(Alignment.TopCenter)
+                                    .padding(top = 60.dp, start = 16.dp, end = 16.dp)
+                                    .zIndex(10f)
+                                    .fillMaxWidth(0.9f)
                             )
                         }
-                    }
                     
                     
-                    if (sosMode && !pickMode) {
-                        EmergencyRouteLabel(
-                            isRouteUnavailable = mapState.isRouteUnavailable,
-                            modifier = Modifier
-                                .align(Alignment.TopCenter)
-                                .padding(top = 16.dp)
-                        )
-                    }
-                    
-                    
-                    if (!pickMode) {
-                        if (mapState.isRouteUnavailable) {
-                            
-                            RouteUnavailableMessage(
+                        if (pickMode || (sosMode && startNodeId.isEmpty())) {
+                            Surface(
                                 modifier = Modifier
-                                    .align(Alignment.BottomStart)
-                                    .padding(start = 16.dp, bottom = innerPadding.calculateBottomPadding() + 16.dp)
-                                    .zIndex(10f) // Ensure above map
-                            )
-                        } else if (navigationSteps.isNotEmpty()) {
-                            
-                            NavigationStepsPanel(
-                                steps = navigationSteps,
-                                currentStepIndex = currentStepIndex,
-                                onStepClick = { index -> viewModel.setCurrentStepIndex(index) },
-                                onToggleSteps = { showStepsPanel = !showStepsPanel },
-                                isExpanded = showStepsPanel,
-                                destinationName = if (sosMode) "Emergency Exit" else (mapState.destinationRoom?.name ?: "Destination"),
+                                    .align(Alignment.BottomCenter)
+                                    .padding(bottom = bottomPadding + innerPadding.calculateBottomPadding() + 16.dp, start = 16.dp, end = 16.dp)
+                                    .fillMaxWidth(0.9f)
+                                    .zIndex(10f),
+                                shape = RoundedCornerShape(12.dp),
+                                color = if (sosMode) Color(0xFFDC3545).copy(alpha = 0.9f) else PrimaryBlue.copy(alpha = 0.9f)
+                            ) {
+                                val context = LocalContext.current
+                                Text(
+                                    text = if (sosMode) context.getString(R.string.tap_to_select_sos) else context.getString(R.string.tap_to_select_start),
+                                    color = Color.White,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
+                        }
+                        
+                        if (sosMode && !pickMode) {
+                            EmergencyRouteLabel(
+                                isRouteUnavailable = mapState.isRouteUnavailable,
                                 modifier = Modifier
-                                    .align(Alignment.BottomStart)
-                                    .padding(start = 16.dp, end = 80.dp, bottom = innerPadding.calculateBottomPadding() + 16.dp)
-                                    .zIndex(10f) // Ensure above map
+                                    .align(Alignment.TopCenter)
+                                    .padding(top = 60.dp)
+                                    .zIndex(10f)
                             )
                         }
-                    }
-                    
-                    if (!pickMode) {
-                        BottomControls(
-                            onRecenter = {
-                                android.util.Log.d("MapScreen", "Recenter button clicked")
-                                viewModel.recenterMap()
-                            },
-                            onZoomIn = {
-                                android.util.Log.d("MapScreen", "Zoom in button clicked")
-                                viewModel.zoomIn()
-                            },
-                            onZoomOut = {
-                                android.util.Log.d("MapScreen", "Zoom out button clicked")
-                                viewModel.zoomOut()
-                            },
-                            modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .padding(end = 16.dp, bottom = innerPadding.calculateBottomPadding() + 16.dp)
-                                .zIndex(10f) // Ensure above map
-                        )
+                        
+                        if (!pickMode) {
+                            if (mapState.isRouteUnavailable) {
+                                RouteUnavailableMessage(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomStart)
+                                        .padding(start = 16.dp, bottom = bottomPadding + innerPadding.calculateBottomPadding() + 16.dp)
+                                        .zIndex(10f)
+                                        .fillMaxWidth(0.75f)
+                                )
+                            } else if (navigationSteps.isNotEmpty()) {
+                                NavigationStepsPanel(
+                                    steps = navigationSteps,
+                                    currentStepIndex = currentStepIndex,
+                                    onStepClick = { index -> viewModel.setCurrentStepIndex(index) },
+                                    onToggleSteps = { showStepsPanel = !showStepsPanel },
+                                    isExpanded = showStepsPanel,
+                                    destinationName = if (sosMode) "Emergency Exit" else (mapState.destinationRoom?.name ?: "Destination"),
+                                    modifier = Modifier
+                                        .align(Alignment.BottomStart)
+                                        .padding(start = 16.dp, end = 80.dp, bottom = bottomPadding + innerPadding.calculateBottomPadding() + 16.dp)
+                                        .zIndex(10f)
+                                        .fillMaxWidth(0.75f)
+                                )
+                            }
+                        }
+                        
+                        if (!pickMode) {
+                            BottomControls(
+                                onRecenter = {
+                                    android.util.Log.d("MapScreen", "Recenter button clicked")
+                                    viewModel.recenterMap()
+                                },
+                                onZoomIn = {
+                                    android.util.Log.d("MapScreen", "Zoom in button clicked")
+                                    viewModel.zoomIn()
+                                },
+                                onZoomOut = {
+                                    android.util.Log.d("MapScreen", "Zoom out button clicked")
+                                    viewModel.zoomOut()
+                                },
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .padding(end = 16.dp, bottom = bottomPadding + innerPadding.calculateBottomPadding() + 16.dp)
+                                    .zIndex(10f)
+                            )
+                        }
                     }
                 }
                 is MapUiState.Error -> {
@@ -412,7 +401,6 @@ private fun TopControls(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        
         FloatingActionButton(
             onClick = onBackClick,
             modifier = Modifier.size(48.dp),
@@ -446,9 +434,7 @@ private fun NavigationStepsPanel(
 ) {
     Column(
         modifier = modifier
-            .fillMaxWidth(0.75f)
     ) {
-        
         Button(
             onClick = onToggleSteps,
             modifier = Modifier.fillMaxWidth(),
@@ -491,7 +477,6 @@ private fun NavigationStepsPanel(
                 )
             }
         }
-        
         
         if (isExpanded) {
             Surface(
@@ -610,7 +595,6 @@ private fun NavigationStepItem(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            
             Surface(
                 modifier = Modifier.size(32.dp),
                 shape = CircleShape,
@@ -629,7 +613,6 @@ private fun NavigationStepItem(
                 }
             }
             
-            
             val directionIcon = when (step.direction) {
                 NavigationDirection.START -> Icons.Default.PlayArrow
                 NavigationDirection.STRAIGHT -> Icons.AutoMirrored.Filled.ArrowForward
@@ -641,7 +624,6 @@ private fun NavigationStepItem(
                 NavigationDirection.SHARP_RIGHT -> Icons.AutoMirrored.Filled.ArrowForward
                 NavigationDirection.ARRIVE -> Icons.Default.Place
             }
-            
             
             val rotation = when (step.direction) {
                 NavigationDirection.LEFT -> -90f
@@ -663,7 +645,6 @@ private fun NavigationStepItem(
                     .size(24.dp)
                     .rotate(rotation)
             )
-            
             
             Column(
                 modifier = Modifier.weight(1f)
@@ -694,8 +675,10 @@ private fun BuildingSelector(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = modifier
+            .horizontalScroll(rememberScrollState(), enabled = false),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         BuildingButton(
             building = "J",
@@ -705,6 +688,7 @@ private fun BuildingSelector(
                 onBuildingSelected("J") 
             }
         )
+        Spacer(modifier = Modifier.width(8.dp))
         BuildingButton(
             building = "H",
             isSelected = selectedBuilding == "H",
@@ -804,7 +788,6 @@ private fun BottomControls(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        
         FloatingActionButton(
             onClick = {
                 android.util.Log.d("BottomControls", "Recenter FAB clicked")
@@ -842,7 +825,6 @@ private fun BottomControls(
             )
         }
         
-        
         FloatingActionButton(
             onClick = {
                 android.util.Log.d("BottomControls", "Zoom out FAB clicked")
@@ -852,7 +834,6 @@ private fun BottomControls(
             containerColor = Color.White,
             elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp)
         ) {
-            // Use a horizontal line as zoom-out icon
             Box(
                 modifier = Modifier.size(24.dp),
                 contentAlignment = Alignment.Center

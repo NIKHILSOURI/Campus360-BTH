@@ -12,10 +12,8 @@ import java.io.IOException
 class MapRepository(private val context: Context) {
     private val gson = Gson()
     
-    // Multi-building support
     private val _buildings: MutableMap<String, BuildingData> = mutableMapOf()
     
-    // Legacy single-building support (for backward compatibility)
     private var _mapInfo: MapInfo? = null
     private var _rooms: List<Room>? = null
     private var _roomsById: Map<String, Room> = emptyMap() 
@@ -23,20 +21,16 @@ class MapRepository(private val context: Context) {
     private var _nodesById: Map<String, Node> = emptyMap() 
     private var _floorplanBitmap: Bitmap? = null
     
-    // Cross-building navigation: exit/entrance mappings
-    // Building J exit -> Building H entrance
-    private val jExitNodeId = "node_j1650_door_right" // Using existing exit node
+    private val jExitNodeId = "node_j1650_door_right"
     private val hEntranceNodeId = "h_entrance"
-    // Building H exit -> Building J entrance  
-    private val hExitNodeId = "h_entrance" // Same as entrance for now
-    private val jEntranceNodeId = "node_staircase" // Using staircase as entrance
+    private val hExitNodeId = "h_entrance"
+    private val jEntranceNodeId = "node_staircase"
     
     val mapInfo: MapInfo? get() = _mapInfo
     val rooms: List<Room>? get() = _rooms
     val graph: Graph? get() = _graph
     val floorplanBitmap: Bitmap? get() = _floorplanBitmap
     
-    // Multi-building accessors
     fun getBuilding(buildingId: String): BuildingData? = _buildings[buildingId]
     fun getAllBuildings(): Map<String, BuildingData> = _buildings.toMap()
     suspend fun getBuildingBitmap(buildingId: String): Bitmap? = withContext(Dispatchers.IO) {
@@ -107,7 +101,6 @@ class MapRepository(private val context: Context) {
             }
             android.util.Log.d("MapRepository", "Graph loaded: ${loadedGraph.nodes.size} nodes, ${loadedGraph.edges.size} edges")
             
-            // Make edges bidirectional
             val edgeSet = loadedGraph.edges.map { "${it.from}:${it.to}" }.toSet()
             val bidirectionalEdges = mutableListOf<Edge>()
             bidirectionalEdges.addAll(loadedGraph.edges)
@@ -167,7 +160,6 @@ class MapRepository(private val context: Context) {
         try {
             android.util.Log.d("MapRepository", "Loading all buildings...")
             
-            // Load Building J
             val buildingJ = loadBuilding("J")
             if (buildingJ != null) {
                 _buildings["J"] = buildingJ
@@ -176,7 +168,6 @@ class MapRepository(private val context: Context) {
                 android.util.Log.w("MapRepository", "Building J failed to load")
             }
             
-            // Load Building H
             val buildingH = loadBuilding("H")
             if (buildingH != null) {
                 _buildings["H"] = buildingH
@@ -185,7 +176,6 @@ class MapRepository(private val context: Context) {
                 android.util.Log.w("MapRepository", "Building H failed to load - check if h_graph.json, h_rooms.json, h_map_info.json exist")
             }
             
-            // For backward compatibility, set Building J as default
             if (buildingJ != null) {
                 _mapInfo = buildingJ.mapInfo
                 _rooms = buildingJ.rooms
@@ -207,13 +197,11 @@ class MapRepository(private val context: Context) {
     }
     
     suspend fun loadAllAssets(): Boolean = withContext(Dispatchers.IO) {
-        // Try loading all buildings first
         val buildingsLoaded = loadAllBuildings()
         if (buildingsLoaded) {
             return@withContext true
         }
         
-        // Fallback to legacy single-building loading
         try {
             android.util.Log.d("MapRepository", "Loading all assets in parallel...")
             val startTime = System.currentTimeMillis()
@@ -354,7 +342,6 @@ class MapRepository(private val context: Context) {
     private fun loadBitmapFromAssets(fileName: String): Bitmap? {
         return try {
             android.util.Log.d("MapRepository", "Attempting to load bitmap asset: $fileName")
-            // List available assets for debugging
             try {
                 val assetList = context.assets.list("")?.filter { it.endsWith(".png", ignoreCase = true) }
                 android.util.Log.d("MapRepository", "Available PNG assets: ${assetList?.joinToString()}")
@@ -457,11 +444,9 @@ class MapRepository(private val context: Context) {
     }
     
     fun getRoomById(roomId: String): Room? {
-        // First check legacy single-building storage
         val legacyRoom = _roomsById[roomId]
         if (legacyRoom != null) return legacyRoom
         
-        // Search across all buildings
         for (building in _buildings.values) {
             val room = building.rooms.find { it.id == roomId }
             if (room != null) return room
@@ -473,7 +458,6 @@ class MapRepository(private val context: Context) {
         val allRooms = if (buildingId != null) {
             _buildings[buildingId]?.rooms ?: emptyList()
         } else {
-            // Search across all buildings
             _buildings.values.flatMap { it.rooms }
         }
         
@@ -505,9 +489,6 @@ class MapRepository(private val context: Context) {
         }
     }
     
-    /**
-     * Get cross-building route if start and end are in different buildings
-     */
     fun getCrossBuildingRoute(startRoomId: String, endRoomId: String): CrossBuildingRoute? {
         val startRoom = getRoomById(startRoomId) ?: return null
         val endRoom = getRoomById(endRoomId) ?: return null
@@ -518,7 +499,6 @@ class MapRepository(private val context: Context) {
         android.util.Log.d("MapRepository", "=== Building cross-building route ===")
         android.util.Log.d("MapRepository", "Start: $startRoomId in $startBuildingId, End: $endRoomId in $endBuildingId")
         
-        // Same building - use regular route
         if (startBuildingId == endBuildingId) {
             val route = getRoute(startRoom.nodeId, endRoom.nodeId, startBuildingId)
             return if (route != null) {
@@ -529,7 +509,6 @@ class MapRepository(private val context: Context) {
             } else null
         }
         
-        // Cross-building route
         val startBuilding = _buildings[startBuildingId] ?: return null
         val endBuilding = _buildings[endBuildingId] ?: return null
         
@@ -540,14 +519,12 @@ class MapRepository(private val context: Context) {
         android.util.Log.d("MapRepository", "Segment 0 will be: $startBuildingId (start -> exit)")
         android.util.Log.d("MapRepository", "Segment 1 will be: $endBuildingId (entrance -> end)")
         
-        // Segment 0: Start room -> Exit of start building (ALWAYS FIRST)
         val segment0Route = getRoute(startRoom.nodeId, startExitNodeId, startBuildingId)
         if (segment0Route == null) {
             android.util.Log.e("MapRepository", "Failed to compute segment 0 route in $startBuildingId")
             return null
         }
         
-        // Segment 1: Entrance of end building -> End room (ALWAYS SECOND)
         val segment1Route = getRoute(endEntranceNodeId, endRoom.nodeId, endBuildingId)
         if (segment1Route == null) {
             android.util.Log.e("MapRepository", "Failed to compute segment 1 route in $endBuildingId")

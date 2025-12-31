@@ -28,6 +28,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.asPaddingValues
 import com.example.campus360.R
 import com.example.campus360.data.Landmark
 import com.example.campus360.navigation.Screen
@@ -83,15 +86,25 @@ fun ChooseStartLocationScreen(
         }
     }
     
+    val windowInsets = WindowInsets.systemBars
+    val insetsPadding = windowInsets.asPaddingValues()
+    val topPadding = insetsPadding.calculateTopPadding()
+    val bottomPadding = insetsPadding.calculateBottomPadding()
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF8F9FC))
     ) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = topPadding),
+            color = Color(0xFFF8F9FC)
+        ) {
+            Header(onBackClick = { navController.popBackStack() })
+        }
         
-        Header(onBackClick = { navController.popBackStack() })
-        
-      
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -173,12 +186,17 @@ fun ChooseStartLocationScreen(
             Spacer(modifier = Modifier.height(24.dp))
         }
         
-        
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route ?: Screen.Home.route
-        BottomNavigation(
-            currentRoute = currentRoute,
-            onNavigate = { route ->
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = bottomPadding),
+            color = Color(0xFFF8F9FC)
+        ) {
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route ?: Screen.Home.route
+            BottomNavigation(
+                currentRoute = currentRoute,
+                onNavigate = { route ->
                 when (route) {
                     Screen.Home.route -> navController.navigate(route) {
                         popUpTo(navController.graph.startDestinationId) {
@@ -211,7 +229,8 @@ fun ChooseStartLocationScreen(
                     else -> {}
                 }
             }
-        )
+            )
+        }
     }
 }
 
@@ -220,7 +239,6 @@ private fun Header(onBackClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFFF8F9FC))
             .padding(horizontal = 16.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
