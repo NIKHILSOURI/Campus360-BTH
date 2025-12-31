@@ -43,7 +43,6 @@ class ChooseStartLocationViewModel(application: Application) : AndroidViewModel(
             try {
                 android.util.Log.d("ChooseStartLocationViewModel", "Loading destination room: $roomId")
                 
-                // Load all buildings (including H)
                 val buildingsLoaded = repository.loadAllBuildings()
                 if (!buildingsLoaded) {
                     android.util.Log.w("ChooseStartLocationViewModel", "Failed to load all buildings, trying legacy load...")
@@ -58,7 +57,6 @@ class ChooseStartLocationViewModel(application: Application) : AndroidViewModel(
                     android.util.Log.e("ChooseStartLocationViewModel", "Room not found: $roomId")
                 }
                 
-                // Get rooms from ALL buildings (J and H)
                 val allBuildingRooms = repository.getAllBuildings().values.flatMap { it.rooms }
                 android.util.Log.d("ChooseStartLocationViewModel", "Loaded ${allBuildingRooms.size} rooms from all buildings (J: ${repository.getBuilding("J")?.rooms?.size ?: 0}, H: ${repository.getBuilding("H")?.rooms?.size ?: 0})")
                 _allPlaces.value = allBuildingRooms

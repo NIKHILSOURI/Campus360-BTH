@@ -61,7 +61,6 @@ fun MapView(
     var mapRenderInfo by remember { mutableStateOf<MapRenderInfo?>(null) }
     
     LaunchedEffect(scale, translateX, translateY) {
-        // Always sync when scale changes (zoom buttons), but respect user interaction for pan
         if (!isUserInteracting || scale != internalScale) {
             internalScale = scale
             internalOffsetX = translateX
@@ -136,7 +135,6 @@ fun MapView(
                 val destinationChanged = destinationNode != lastDestinationNode
                 
                 if (routeChanged || destinationChanged) {
-                    // Update last seen values to track changes
                     if (route != null) lastRoute = route
                     if (destinationNode != null) lastDestinationNode = destinationNode
                     

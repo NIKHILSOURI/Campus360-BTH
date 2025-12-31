@@ -142,20 +142,23 @@ fun HomeScreen(
             
             
             Spacer(modifier = Modifier.height(24.dp))
-            OpenMapButton(
-                onClick = { viewModel.openMap() },
+            Row(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = 16.dp)
-            )
-            
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            SOSButton(
-                onClick = { viewModel.openSOS() },
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = innerPadding.calculateBottomPadding())
-            )
+                    .padding(bottom = innerPadding.calculateBottomPadding()),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                OpenMapButton(
+                    onClick = { viewModel.openMap() },
+                    modifier = Modifier.weight(1f)
+                )
+                
+                SOSButton(
+                    onClick = { viewModel.openSOS() },
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
     }
 }
@@ -411,17 +414,16 @@ private fun OpenMapButton(
     Button(
         onClick = onClick,
         modifier = modifier
-            .fillMaxWidth()
-            .height(58.dp), // 56-60px range (58dp ≈ 58px)
-        shape = RoundedCornerShape(14.dp), // 12-16px range (14dp ≈ 14px)
+            .height(58.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF3D6DFF) // Primary blue #3D6DFF
+            containerColor = Color(0xFF3D6DFF)
         ),
         elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 3.dp, // Soft elevation 2-4dp
+            defaultElevation = 3.dp,
             pressedElevation = 2.dp
         ),
-        contentPadding = PaddingValues(0.dp) // Remove default padding for better centering
+        contentPadding = PaddingValues(0.dp)
     ) {
         val context = LocalContext.current
         Text(
@@ -443,14 +445,13 @@ private fun SOSButton(
     Button(
         onClick = onClick,
         modifier = modifier
-            .fillMaxWidth()
             .height(58.dp),
         shape = RoundedCornerShape(14.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFFDC3545) // Red color for emergency
+            containerColor = Color(0xFFDC3545)
         ),
         elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 4.dp, // Higher elevation for prominence
+            defaultElevation = 4.dp,
             pressedElevation = 3.dp
         ),
         contentPadding = PaddingValues(0.dp)
