@@ -1,4 +1,67 @@
 <resources>
     <string name="app_name">Campus360</string>
+    
+    <string name="settings">Inställningar</string>
+    <string name="language">Språk</string>
+    <string name="english">Engelska</string>
+    <string name="swedish">Svenska</string>
+    <string name="map">Karta</string>
+    <string name="download_map">Ladda ner karta</string>
+    <string name="contact">Kontakt</string>
+    <string name="about_campus360">Om Campus360</string>
+    <string name="app_description">Appbeskrivning</string>
+    <string name="app_description_text">Campus360 är din app för att navigera på universitetsområdet. Hitta klassrum, kontor och mer med lätthet.</string>
+    <string name="course_university_info">Kurs/Universitetsinformation</string>
+    <string name="course_university_info_text">Utvecklad av studenter vid universitetet, Campus360 är ett projekt som syftar till att förbättra campusnavigation.</string>
+    <string name="version_number">Versionsnummer</string>
+    <string name="language_changed_english">Språk ändrat till Engelska</string>
+    <string name="language_changed_swedish">Språk ändrat till Svenska</string>
+    <string name="map_download_started">Kartnedladdning startad. Kartdata ingår redan i appen.</string>
+    <string name="map_download_success">Karta nedladdad till nedladdningsmappen</string>
+    <string name="map_download_error">Fel vid nedladdning av karta: %1$s</string>
+    <string name="selected">Vald</string>
+    <string name="not_selected">Inte vald</string>
+    
+    <string name="home">Hem</string>
+    <string name="search">Sök</string>
+    <string name="search_placeholder">Sök efter rum eller område…</string>
+    <string name="search_by_name">Sök efter namn eller rummnummer…</string>
+    <string name="quick_categories">Snabbkategorier</string>
+    <string name="recent_destinations">Senaste destinationer</string>
+    <string name="open_map">Öppna karta</string>
+    <string name="sos">Nöd</string>
+    <string name="recent_searches">Senaste sökningar</string>
+    <string name="find_a_room">Hitta ett rum</string>
+    <string name="tap_to_select_start">Tryck på kartan för att välja din startplats</string>
+    <string name="tap_to_select_sos">Tryck på kartan för att välja din nuvarande plats för nödutgångsrutten</string>
+    <string name="go_back">Gå tillbaka</string>
+    <string name="no_emergency_route">Ingen nödutgångsrutten hittades</string>
+    <string name="emergency_route">Nödutgångsrutten till närmaste utgång</string>
+    <string name="no_directions">Inga vägbeskrivningar hittades</string>
+    <string name="no_route_message">Vi kunde inte hitta en rutt till denna destination.</string>
+    <string name="units">enheter</string>
+    <string name="recenter">Centrera</string>
+    <string name="zoom_in">Zooma in</string>
+    <string name="zoom_out">Zooma ut</string>
+    <string name="map_icon">Karta</string>
+    <string name="language_icon">Språk</string>
+    <string name="search_icon">Sök</string>
+    <string name="navigate">Navigera</string>
+    <string name="location">Plats</string>
+    <string name="sos_icon">Nöd</string>
+    <string name="back">Tillbaka</string>
+    <string name="warning">Varning</string>
+    <string name="no_rooms_found">Inga rum hittades i denna kategori</string>
+    <string name="room_details">Ruminformation</string>
+    <string name="room_information">Ruminformation</string>
+    <string name="navigate_from_location">Navigera från min plats</string>
+    <string name="show_on_map">Visa på karta</string>
+    <string name="choose_from_list">Välj från lista</string>
+    <string name="start_location">Startplats</string>
+    <string name="select">Välj</string>
+    <string name="pick_from_map">Välj från karta</string>
+    <string name="pick_from_map_instruction">Tryck på knappen ovan för att öppna kartan och välj din startplats genom att trycka på kartan.</string>
+    <string name="navigating_your_space">Navigerar ditt utrymme</string>
+    <string name="campus360_logo">Campus360 Logotyp</string>
 </resources>
 

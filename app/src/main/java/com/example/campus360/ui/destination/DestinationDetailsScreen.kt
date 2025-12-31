@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.ui.platform.LocalContext
+import com.example.campus360.R
 import com.example.campus360.navigation.Screen
 import com.example.campus360.ui.theme.PrimaryBlue
 
@@ -66,17 +68,19 @@ fun DestinationDetailsScreen(
         topBar = {
             TopAppBar(
                 title = {
+                    val context = LocalContext.current
                     Text(
-                        text = "Room Details",
+                        text = context.getString(R.string.room_details),
                         color = Color(0xFF0D121B),
                         fontWeight = FontWeight.Bold
                     )
                 },
                 navigationIcon = {
+                    val context = LocalContext.current
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = context.getString(R.string.back),
                             tint = Color(0xFF0D121B)
                         )
                     }
@@ -185,10 +189,11 @@ fun DestinationDetailsScreen(
                             color = MaterialTheme.colorScheme.error,
                             fontSize = 16.sp
                         )
+                        val context = LocalContext.current
                         Button(
                             onClick = { navController.popBackStack() }
                         ) {
-                            Text("Go Back")
+                            Text(context.getString(R.string.go_back))
                         }
                     }
                 }
@@ -212,8 +217,9 @@ private fun RoomInformation(
             .padding(horizontal = 16.dp, vertical = 20.dp)
     ) {
         
+        val context = LocalContext.current
         Text(
-            text = "Room Information",
+            text = context.getString(R.string.room_information),
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF0D121B),
@@ -265,8 +271,9 @@ private fun RoomInformation(
                     containerColor = PrimaryBlue
                 )
             ) {
+                val context = LocalContext.current
                 Text(
-                    text = "Navigate from my location",
+                    text = context.getString(R.string.navigate_from_location),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -284,8 +291,9 @@ private fun RoomInformation(
                     contentColor = Color(0xFF0D121B)
                 )
             ) {
+                val context = LocalContext.current
                 Text(
-                    text = "Show on map",
+                    text = context.getString(R.string.show_on_map),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF0D121B)

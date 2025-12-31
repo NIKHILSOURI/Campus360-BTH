@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.campus360.data.Landmark
 import com.example.campus360.data.MapRepository
 import com.example.campus360.data.Room
-import com.example.campus360.navigation.Screen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow   
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,27 +43,25 @@ class ChooseStartLocationViewModel(application: Application) : AndroidViewModel(
             try {
                 android.util.Log.d("ChooseStartLocationViewModel", "Loading destination room: $roomId")
                 
-                
-                if (!repository.isDataLoaded()) {
-                    android.util.Log.d("ChooseStartLocationViewModel", "Data not loaded, loading assets...")
-                    val success = repository.loadAllAssets()
-                    if (!success) {
-                        android.util.Log.e("ChooseStartLocationViewModel", "Failed to load assets")
-                        return@launch
-                    }
+                // Load all buildings (including H)
+                val buildingsLoaded = repository.loadAllBuildings()
+                if (!buildingsLoaded) {
+                    android.util.Log.w("ChooseStartLocationViewModel", "Failed to load all buildings, trying legacy load...")
+                    repository.loadAllAssets()
                 }
                 
                 val room = repository.getRoomById(roomId)
                 if (room != null) {
-                    android.util.Log.d("ChooseStartLocationViewModel", "Destination room loaded: ${room.name} (${room.nodeId})")
+                    android.util.Log.d("ChooseStartLocationViewModel", "Destination room loaded: ${room.name} (${room.nodeId}) in ${room.building}")
                     _destinationRoom.value = room
                 } else {
                     android.util.Log.e("ChooseStartLocationViewModel", "Room not found: $roomId")
                 }
                 
-                
-                val allRooms = repository.rooms ?: emptyList()
-                _allPlaces.value = allRooms
+                // Get rooms from ALL buildings (J and H)
+                val allBuildingRooms = repository.getAllBuildings().values.flatMap { it.rooms }
+                android.util.Log.d("ChooseStartLocationViewModel", "Loaded ${allBuildingRooms.size} rooms from all buildings (J: ${repository.getBuilding("J")?.rooms?.size ?: 0}, H: ${repository.getBuilding("H")?.rooms?.size ?: 0})")
+                _allPlaces.value = allBuildingRooms
             } catch (e: Exception) {
                 android.util.Log.e("ChooseStartLocationViewModel", "Error loading destination room", e)
                 e.printStackTrace()
@@ -102,26 +99,6 @@ class ChooseStartLocationViewModel(application: Application) : AndroidViewModel(
         }
     }
     
-    fun showMapPicker() {
-        android.util.Log.d("ChooseStartLocationViewModel", "Show map picker requested")
-        val destinationRoom = _destinationRoom.value
-        if (destinationRoom != null) {
-            android.util.Log.d("ChooseStartLocationViewModel", "Navigating to map picker for room: ${destinationRoom.id}")
-            _uiState.value = ChooseStartLocationUiState.ShowMapPicker(destinationRoom.id)
-        } else {
-            android.util.Log.e("ChooseStartLocationViewModel", "Destination room is null, cannot show map picker")
-        }
-    }
-    
-    fun selectNodeFromMap(nodeId: String) {
-        val destinationRoom = _destinationRoom.value
-        if (destinationRoom != null) {
-            _uiState.value = ChooseStartLocationUiState.NavigateToMap(
-                roomId = destinationRoom.id,
-                startNodeId = nodeId
-            )
-        }
-    }
     
     fun clearNavigation() {
         _uiState.value = ChooseStartLocationUiState.Idle

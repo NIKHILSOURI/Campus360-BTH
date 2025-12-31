@@ -4,17 +4,13 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.*
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.example.campus360.data.MapInfo
@@ -37,7 +33,8 @@ fun MapView(
     onScaleChange: (Float) -> Unit = {},
     onTranslateChange: (Float, Float) -> Unit = { _, _ -> },
     onMapClick: ((Double, Double) -> Unit)? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selectedBuilding: String = "J"
 ) {
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
     var internalScale by remember { mutableStateOf(scale) }
@@ -50,10 +47,12 @@ fun MapView(
     var interactionEndTime by remember { mutableStateOf(0L) }
     
     LaunchedEffect(scale, translateX, translateY) {
-        if (!isUserInteracting) {
+        // Always sync when scale changes (zoom buttons), but respect user interaction for pan
+        if (!isUserInteracting || scale != internalScale) {
             internalScale = scale
             internalOffsetX = translateX
             internalOffsetY = translateY
+            android.util.Log.d("MapView", "Syncing map state: scale=$scale, translateX=$translateX, translateY=$translateY")
         }
     }
     
@@ -86,8 +85,9 @@ fun MapView(
                 val destinationChanged = destinationNode != lastDestinationNode
                 
                 if (routeChanged || destinationChanged) {
-                    lastRoute = route
-                    lastDestinationNode = destinationNode
+                    // Update last seen values to track changes
+                    if (route != null) lastRoute = route
+                    if (destinationNode != null) lastDestinationNode = destinationNode
                     
                     val mapWidth = mapInfo.width.toFloat()
                     val mapHeight = mapInfo.height.toFloat()
@@ -147,7 +147,8 @@ fun MapView(
     
     LaunchedEffect(recenterTrigger) {
         if (recenterTrigger > lastRecenterTrigger && bitmap != null && mapInfo != null && canvasSize.width > 0 && canvasSize.height > 0) {
-            lastRecenterTrigger = recenterTrigger
+            val newRecenterTrigger = recenterTrigger
+            lastRecenterTrigger = newRecenterTrigger
             isUserInteracting = false
             interactionEndTime = 0L
             
@@ -226,7 +227,7 @@ fun MapView(
             .onSizeChanged { canvasSize = it }
             .pointerInput(Unit) {
                 detectTransformGestures(
-                    onGesture = { centroid, pan, zoom, rotation ->
+                    onGesture = { _, pan, zoom, _ ->
                         isUserInteracting = true
                         val newScale = (internalScale * zoom).coerceIn(0.5f, 5f)
                         internalScale = newScale
@@ -242,7 +243,7 @@ fun MapView(
                     onDragStart = {
                         isUserInteracting = true
                     },
-                    onDrag = { change, dragAmount ->
+                    onDrag = { _, dragAmount ->
                         isUserInteracting = true
                         internalOffsetX += dragAmount.x
                         internalOffsetY += dragAmount.y
