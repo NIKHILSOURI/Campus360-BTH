@@ -1,5 +1,4 @@
 package com.example.campus360.ui.home
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -28,6 +27,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.ui.platform.LocalContext
+import com.example.campus360.R
 import com.example.campus360.navigation.Screen
 import com.example.campus360.ui.theme.PrimaryBlue
 
@@ -161,6 +162,7 @@ fun HomeScreen(
 
 @Composable
 private fun Header(onGlobeClick: () -> Unit) {
+    val context = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -171,13 +173,13 @@ private fun Header(onGlobeClick: () -> Unit) {
     ) {
         Icon(
             imageVector = Icons.Default.Place,
-            contentDescription = "Map",
+            contentDescription = context.getString(R.string.map_icon),
             tint = Color(0xFF0D121B),
             modifier = Modifier.size(24.dp)
         )
         
         Text(
-            text = "Campus360",
+            text = context.getString(R.string.app_name),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF0D121B),
@@ -188,7 +190,7 @@ private fun Header(onGlobeClick: () -> Unit) {
         IconButton(onClick = onGlobeClick) {
             Icon(
                 imageVector = Icons.Default.Settings,
-                contentDescription = "Language",
+                contentDescription = context.getString(R.string.language_icon),
                 tint = Color(0xFF0D121B),
                 modifier = Modifier.size(24.dp)
             )
@@ -202,6 +204,7 @@ private fun SearchBar(
     onQueryChange: (String) -> Unit,
     onSearchClick: () -> Unit
 ) {
+    val context = LocalContext.current
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -218,7 +221,7 @@ private fun SearchBar(
         ) {
             Icon(
                 imageVector = Icons.Default.Search,
-                contentDescription = "Search",
+                contentDescription = context.getString(R.string.search_icon),
                 tint = Color(0xFF4C669A),
                 modifier = Modifier.size(24.dp)
             )
@@ -226,7 +229,7 @@ private fun SearchBar(
             Spacer(modifier = Modifier.width(12.dp))
             
             Text(
-                text = if (query.isEmpty()) "Search for room or area..." else query,
+                text = if (query.isEmpty()) context.getString(R.string.search_placeholder) else query,
                 color = if (query.isEmpty()) Color(0xFF4C669A).copy(alpha = 0.6f) else Color(0xFF0D121B),
                 modifier = Modifier.weight(1f)
             )
@@ -245,8 +248,9 @@ private fun QuickCategories(
             .fillMaxWidth()
             .padding(top = 16.dp)
     ) {
+        val context = LocalContext.current
         Text(
-            text = "Quick Categories",
+            text = context.getString(R.string.quick_categories),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF0D121B),
@@ -333,8 +337,9 @@ private fun RecentDestinations(
             .fillMaxWidth()
             .padding(top = 24.dp)
     ) {
+        val context = LocalContext.current
         Text(
-            text = "Recent Destinations",
+            text = context.getString(R.string.recent_destinations),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF0D121B),
@@ -378,9 +383,10 @@ private fun RecentDestinationItem(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxSize()
             ) {
+                val context = LocalContext.current
                 Icon(
                     imageVector = Icons.Default.LocationOn,
-                    contentDescription = "Location",
+                    contentDescription = context.getString(R.string.location),
                     tint = Color(0xFF0D121B),
                     modifier = Modifier.size(20.dp)
                 )
@@ -417,8 +423,9 @@ private fun OpenMapButton(
         ),
         contentPadding = PaddingValues(0.dp) // Remove default padding for better centering
     ) {
+        val context = LocalContext.current
         Text(
-            text = "Open Map",
+            text = context.getString(R.string.open_map),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
@@ -453,15 +460,16 @@ private fun SOSButton(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val context = LocalContext.current
             Icon(
                 imageVector = Icons.Default.Warning,
-                contentDescription = "SOS",
+                contentDescription = context.getString(R.string.sos_icon),
                 tint = Color.White,
                 modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "SOS",
+                text = context.getString(R.string.sos),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,

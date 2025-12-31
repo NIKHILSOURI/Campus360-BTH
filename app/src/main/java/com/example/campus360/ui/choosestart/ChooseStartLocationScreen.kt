@@ -1,6 +1,6 @@
 package com.example.campus360.ui.choosestart
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.background 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -8,7 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.*
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.*  
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.ui.platform.LocalContext
+import com.example.campus360.R
 import com.example.campus360.data.Landmark
 import com.example.campus360.navigation.Screen
 import com.example.campus360.ui.theme.PrimaryBlue
@@ -98,8 +100,9 @@ fun ChooseStartLocationScreen(
                 .padding(horizontal = 16.dp)
         ) {
             
+            val context = LocalContext.current
             Text(
-                text = "Choose from List",
+                text = context.getString(R.string.choose_from_list),
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF0D121B),
@@ -223,16 +226,18 @@ private fun Header(onBackClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = onBackClick) {
+            val context = LocalContext.current
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = context.getString(R.string.back),
                 tint = Color(0xFF0D121B),
                 modifier = Modifier.size(24.dp)
             )
         }
         
+        val context = LocalContext.current
         Text(
-            text = "Start Location",
+            text = context.getString(R.string.start_location),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF0D121B),
@@ -296,9 +301,10 @@ private fun PlaceItem(
             )
             
             
+            val context = LocalContext.current
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Select",
+                contentDescription = context.getString(R.string.select),
                 tint = Color(0xFF4C669A),
                 modifier = Modifier.size(20.dp)
             )
@@ -358,9 +364,10 @@ private fun LandmarkItem(
             )
             
           
+            val context = LocalContext.current
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Select",
+                contentDescription = context.getString(R.string.select),
                 tint = Color(0xFF4C669A),
                 modifier = Modifier.size(20.dp)
             )
@@ -401,15 +408,16 @@ private fun MapPickerSection(
                     contentColor = Color.White
                 )
             ) {
+                val context = LocalContext.current
                 Icon(
                     imageVector = Icons.Default.LocationOn,
-                    contentDescription = "Pick from Map",
+                    contentDescription = context.getString(R.string.pick_from_map),
                     tint = Color.White,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Pick from Map",
+                    text = context.getString(R.string.pick_from_map),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -418,8 +426,9 @@ private fun MapPickerSection(
             
             Spacer(modifier = Modifier.height(16.dp))
             
+            val context = LocalContext.current
             Text(
-                text = "Tap the button above to open the map and select your starting location by tapping on the map.",
+                text = context.getString(R.string.pick_from_map_instruction),
                 fontSize = 14.sp,
                 color = Color(0xFF4C669A),
                 modifier = Modifier.fillMaxWidth()

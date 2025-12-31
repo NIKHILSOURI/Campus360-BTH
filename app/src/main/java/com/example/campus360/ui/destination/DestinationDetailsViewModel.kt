@@ -1,4 +1,5 @@
 package com.example.campus360.ui.destination
+
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,8 +10,8 @@ import com.example.campus360.util.PreferencesManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-
+import kotlinx.coroutines.launch 
+ 
 sealed class DestinationDetailsUiState {
     object Loading : DestinationDetailsUiState()
     data class Success(val room: Room) : DestinationDetailsUiState()

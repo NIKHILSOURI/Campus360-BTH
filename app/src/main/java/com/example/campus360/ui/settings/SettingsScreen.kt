@@ -1,21 +1,21 @@
 package com.example.campus360.ui.settings
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.getValue 
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,6 +24,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.campus360.navigation.Screen
 import com.example.campus360.ui.theme.PrimaryBlue
+import androidx.compose.ui.platform.LocalContext
+import com.example.campus360.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,13 +34,14 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
     
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        "Settings",
+                        context.getString(R.string.settings),
                         color = Color(0xFF0D121B),
                         fontWeight = FontWeight.Bold
                     )
@@ -90,10 +93,23 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .background(Color(0xFFF8F9FC))
                 .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
         ) {
+            LanguageSelectionSection(
+                selectedLanguage = state.selectedLanguage,
+                onLanguageSelected = { languageCode ->
+                    viewModel.updateLanguage(languageCode)
+                    (context as? android.app.Activity)?.recreate()
+                }
+            )
+            
+            DownloadMapSection(
+                onDownloadMap = {
+                    viewModel.downloadMap()
+                }
+            )
             
             ContactSection()
-            
             
             AboutSection(
                 appVersion = state.appVersion
@@ -103,12 +119,143 @@ fun SettingsScreen(
 }
 
 @Composable
+private fun LanguageSelectionSection(
+    selectedLanguage: String?,
+    onLanguageSelected: (String) -> Unit
+) {
+    val context = LocalContext.current
+    
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp)
+    ) {
+        Text(
+            text = context.getString(R.string.language),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF0D121B),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
+        )
+        
+        LanguageOption(
+            languageName = context.getString(R.string.english),
+            isSelected = selectedLanguage == "en",
+            onClick = { onLanguageSelected("en") },
+            languageCode = "en"
+        )
+        
+        LanguageOption(
+            languageName = context.getString(R.string.swedish),
+            isSelected = selectedLanguage == "sv",
+            onClick = { onLanguageSelected("sv") },
+            languageCode = "sv"
+        )
+    }
+}
+
+@Composable
+private fun LanguageOption(
+    languageName: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    languageCode: String = ""
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(12.dp),
+        color = if (isSelected) PrimaryBlue.copy(alpha = 0.1f) else Color.White
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = languageName,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFF0D121B)
+            )
+            
+            if (isSelected) {
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = "Selected",
+                    tint = PrimaryBlue,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DownloadMapSection(
+    onDownloadMap: () -> Unit
+) {
+    val context = LocalContext.current
+    
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 24.dp)
+    ) {
+        Text(
+            text = context.getString(R.string.map),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF0D121B),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
+        )
+        
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp)
+                .clickable(onClick = onDownloadMap),
+            shape = RoundedCornerShape(12.dp),
+            color = Color.White
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = context.getString(R.string.download_map),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF0D121B)
+                )
+                
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "Download",
+                    tint = Color(0xFF9E9E9E),
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun ContactSection() {
+    val context = LocalContext.current
+    
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "Contact",
+            text = context.getString(R.string.contact),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF0D121B),
@@ -118,9 +265,7 @@ private fun ContactSection() {
         
         ContactItem(
             email = "Test@gmail.com",
-            name = "Nikhi,Ajay,Vaatsav",
-
-
+            name = "Nikhi,Ajay,Vaatsav"
         )
     }
 }
@@ -172,13 +317,15 @@ private fun ContactItem(
 private fun AboutSection(
     appVersion: String
 ) {
+    val context = LocalContext.current
+    
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 24.dp)
     ) {
         Text(
-            text = "About Campus360",
+            text = context.getString(R.string.about_campus360),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF0D121B),
@@ -187,20 +334,20 @@ private fun AboutSection(
         
         
         AboutItem(
-            title = "App Description",
-            description = "Campus360 is your go-to app for navigating the university campus. Find classrooms, offices, and more with ease."
+            title = context.getString(R.string.app_description),
+            description = context.getString(R.string.app_description_text)
         )
         
         
         AboutItem(
-            title = "Course/University Information",
-            description = "Developed by students at the university, Campus360 is a project aimed at improving campus navigation."
+            title = context.getString(R.string.course_university_info),
+            description = context.getString(R.string.course_university_info_text)
         )
         
         
         AboutItem(
-            title = "Version Number",
-            description = "Version $appVersion"
+            title = context.getString(R.string.version_number),
+            description = "${context.getString(R.string.version_number)} $appVersion"
         )
     }
 }
