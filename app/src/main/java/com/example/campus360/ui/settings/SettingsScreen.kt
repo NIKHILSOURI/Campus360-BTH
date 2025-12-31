@@ -6,6 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -99,9 +100,8 @@ fun SettingsScreen(
             LanguageSelectionSection(
                 selectedLanguage = state.selectedLanguage,
                 onLanguageSelected = { languageCode ->
-                    viewModel.updateLanguage(languageCode) {
-                        (context as? android.app.Activity)?.recreate()
-                    }
+                    viewModel.updateLanguage(languageCode)
+                    (context as? android.app.Activity)?.recreate()
                 }
             )
             
@@ -239,7 +239,7 @@ private fun DownloadMapSection(
                 )
                 
                 Icon(
-                    imageVector = Icons.Default.ArrowForward,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "Download",
                     tint = Color(0xFF9E9E9E),
                     modifier = Modifier.size(20.dp)

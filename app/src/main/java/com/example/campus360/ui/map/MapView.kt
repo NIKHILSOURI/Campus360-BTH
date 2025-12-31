@@ -34,6 +34,7 @@ fun MapView(
     scale: Float = 1f,
     translateX: Float = 0f,
     translateY: Float = 0f,
+    selectedBuilding: String = "J",
     onScaleChange: (Float) -> Unit = {},
     onTranslateChange: (Float, Float) -> Unit = { _, _ -> },
     onMapClick: ((Double, Double) -> Unit)? = null,
@@ -50,10 +51,12 @@ fun MapView(
     var interactionEndTime by remember { mutableStateOf(0L) }
     
     LaunchedEffect(scale, translateX, translateY) {
-        if (!isUserInteracting) {
+        // Always sync when scale changes (zoom buttons), but respect user interaction for pan
+        if (!isUserInteracting || scale != internalScale) {
             internalScale = scale
             internalOffsetX = translateX
             internalOffsetY = translateY
+            android.util.Log.d("MapView", "Syncing map state: scale=$scale, translateX=$translateX, translateY=$translateY")
         }
     }
     

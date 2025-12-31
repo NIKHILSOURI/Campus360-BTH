@@ -39,13 +39,13 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     
     private fun loadRooms() {
         viewModelScope.launch {
+            // Load all buildings
+            repository.loadAllBuildings()
             
-            if (!repository.isDataLoaded()) {
-                repository.loadAllAssets()
-            }
-            val rooms = repository.rooms ?: emptyList()
-            _allRooms.value = rooms
-            _filteredRooms.value = rooms
+            // Get rooms from all buildings
+            val allBuildingRooms = repository.getAllBuildings().values.flatMap { it.rooms }
+            _allRooms.value = allBuildingRooms
+            _filteredRooms.value = allBuildingRooms
         }
     }
     
@@ -68,11 +68,8 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
             return
         }
         
-        val filtered = _allRooms.value.filter { room ->
-            room.id.lowercase().contains(lowerQuery, ignoreCase = true) ||
-            room.name.lowercase().contains(lowerQuery, ignoreCase = true) ||
-            room.type.lowercase().contains(lowerQuery, ignoreCase = true)
-        }
+        // Use repository search which searches across all buildings
+        val filtered = repository.searchRooms(query)
         
         _filteredRooms.value = filtered
     }

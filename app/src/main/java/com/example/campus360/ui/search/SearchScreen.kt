@@ -292,7 +292,7 @@ private fun RoomResultItem(
                 
                 Column {
                     Text(
-                        text = room.name,
+                        text = "${room.name} (${room.building})",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color(0xFF0D121B)

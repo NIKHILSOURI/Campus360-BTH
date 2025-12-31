@@ -114,21 +114,21 @@ fun NavGraph(navController: NavHostController) {
             DestinationDetailsScreen(navController = navController, roomId = roomId)
         }
         
-               composable(
-                   route = Screen.ChooseStartLocation.route,
-                   arguments = listOf(
-                       navArgument("roomId") {
-                           type = NavType.StringType
-                       }
-                   )
-               ) { backStackEntry ->
-                   val roomId = backStackEntry.arguments?.getString("roomId") ?: ""
-                   ChooseStartLocationScreen(navController = navController, roomId = roomId)
-               }
-               
-               composable(Screen.Settings.route) {
-                   SettingsScreen(navController = navController)
-               }
-           }
-       }
+        composable(
+            route = Screen.ChooseStartLocation.route,
+            arguments = listOf(
+                navArgument("roomId") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            val roomId = backStackEntry.arguments?.getString("roomId") ?: ""
+            ChooseStartLocationScreen(navController = navController, roomId = roomId)
+        }
+        
+        composable(Screen.Settings.route) {
+            SettingsScreen(navController = navController)
+        }
+    }
+}
 
