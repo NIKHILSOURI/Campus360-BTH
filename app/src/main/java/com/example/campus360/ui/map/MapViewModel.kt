@@ -16,14 +16,15 @@ data class MapState(
     val translateY: Float = 0f,
     val route: Route? = null,
     val crossBuildingRoute: CrossBuildingRoute? = null,
-    val currentSegmentIndex: Int = 0, // For cross-building navigation
+    val currentSegmentIndex: Int = 0,
     val destinationRoom: Room? = null,
     val startNode: Node? = null,
     val destinationNode: Node? = null,
     val navigationSteps: List<NavigationStep> = emptyList(),
     val currentStepIndex: Int = 0,
     val isRouteUnavailable: Boolean = false,
-    val selectedBuilding: String = "J"
+    val selectedBuilding: String = "J",
+    val focusTarget: Pair<Double, Double>? = null
 )
 
 sealed class MapUiState {
@@ -62,12 +63,9 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
     
     private fun loadMapData() {
         viewModelScope.launch {
-            // Load all buildings
             val success = repository.loadAllBuildings()
             
             if (success) {
-                // Only load default building (J) if no navigation is active
-                // If navigation is active, the building will be set by loadRoute()
                 if (_mapState.value.crossBuildingRoute == null && _mapState.value.route == null) {
                     android.util.Log.d("MapViewModel", "No active navigation, loading default building J")
                     switchBuilding("J")
@@ -75,7 +73,6 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                     android.util.Log.d("MapViewModel", "Navigation active, preserving selectedBuilding: ${_mapState.value.selectedBuilding}")
                 }
             } else {
-                // Fallback to legacy loading
                 val legacySuccess = repository.loadAllAssets()
                 if (legacySuccess && repository.isDataLoaded()) {
                     val bitmap = repository.floorplanBitmap
@@ -98,7 +95,6 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             android.util.Log.d("MapViewModel", "Switching to building: $buildingId")
             
-            // Ensure buildings are loaded
             var building = repository.getBuilding(buildingId)
             if (building == null) {
                 android.util.Log.w("MapViewModel", "Building $buildingId not found, attempting to reload all buildings...")
@@ -123,10 +119,8 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                 return@launch
             }
             
-            // mapInfo is guaranteed to be non-null from building object
             val finalMapInfo = building.mapInfo
             
-            // Get the route for this building (if there's a cross-building route)
             val routeForBuilding = getRouteForBuilding(buildingId)
             val segmentIndex = getSegmentIndexForBuilding(buildingId)
             
@@ -136,10 +130,9 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
             _floorplanBitmap.value = bitmap
             _mapInfo.value = finalMapInfo
             
-            // Update state with building-specific route
             _mapState.value = _mapState.value.copy(
                 selectedBuilding = buildingId,
-                route = routeForBuilding, // Set route for this building
+                route = routeForBuilding,
                 startNode = routeForBuilding?.nodes?.firstOrNull(),
                 destinationNode = routeForBuilding?.nodes?.lastOrNull(),
                 navigationSteps = routeForBuilding?.steps ?: emptyList(),
@@ -172,14 +165,11 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
             
             val endBuildingId = repository.getRoomBuildingId(roomId) ?: _mapState.value.selectedBuilding
             
-            // Determine start building by checking which building contains the startNodeId
             var startBuildingId = _mapState.value.selectedBuilding
             val startRoom = repository.getRoomById(startNodeId)
             if (startRoom != null) {
-                // startNodeId is actually a room ID
                 startBuildingId = repository.getRoomBuildingId(startRoom.id) ?: _mapState.value.selectedBuilding
             } else {
-                // startNodeId is a node ID - find which building contains it
                 for ((buildingId, building) in repository.getAllBuildings()) {
                     if (building.graph.nodes.any { it.id == startNodeId }) {
                         startBuildingId = buildingId
@@ -188,16 +178,13 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
             
-            // Check for cross-building route
             if (startBuildingId != endBuildingId) {
                 android.util.Log.d("MapViewModel", "=== Starting cross-building navigation ===")
                 android.util.Log.d("MapViewModel", "Start building: $startBuildingId, End building: $endBuildingId")
                 
-                // For cross-building, we need room IDs
                 val startRoomId = if (startRoom != null) {
                     startRoom.id
                 } else {
-                    // Find room that uses this node
                     val building = repository.getBuilding(startBuildingId)
                     val room = building?.rooms?.find { it.nodeId == startNodeId }
                     room?.id ?: startNodeId // Fallback to nodeId if no room found
@@ -215,7 +202,6 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                     android.util.Log.d("MapViewModel", "Initial building (from segment 0): $initialBuildingId")
                     android.util.Log.d("MapViewModel", "Setting selectedBuilding to: $initialBuildingId (start building)")
                     
-                    // Set state with start building (segment 0)
                     _mapState.value = _mapState.value.copy(
                         crossBuildingRoute = crossRoute,
                         currentSegmentIndex = 0,
@@ -226,10 +212,9 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                         navigationSteps = firstSegment.route.steps,
                         currentStepIndex = 0,
                         isRouteUnavailable = false,
-                        selectedBuilding = initialBuildingId // MUST be start building (segment 0)
+                        selectedBuilding = initialBuildingId
                     )
                     
-                    // Switch to start building (this loads the map bitmap)
                     android.util.Log.d("MapViewModel", "Calling switchBuilding($initialBuildingId) to load map")
                     switchBuilding(initialBuildingId)
                     
@@ -245,7 +230,6 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                 return@launch
             }
             
-            // Same building route
             val buildingId = endBuildingId
             val route = repository.getRoute(startNodeId, endRoom.nodeId, buildingId)
             
@@ -268,11 +252,9 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                 selectedBuilding = buildingId
             )
             
-            // Switch to correct building
             switchBuilding(buildingId)
             
             if (!isRouteUnavailable) {
-                // route is guaranteed to be non-null when !isRouteUnavailable
                 val nodes = route!!.nodes
                 val minX = nodes.minOfOrNull { it.x } ?: 0.0
                 val minY = nodes.minOfOrNull { it.y } ?: 0.0
@@ -300,26 +282,52 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                 val building = repository.getBuilding(buildingId)
                 val destinationNode = building?.graph?.nodes?.find { it.id == room.nodeId }
                 
+                android.util.Log.d("MapViewModel", "Loading destination only: room=$roomId, building=$buildingId, node=${destinationNode?.id}")
+                
+                val focusCoord = if (destinationNode != null) {
+                    Pair(destinationNode.x, destinationNode.y)
+                } else if (room.position != null) {
+                    Pair(room.position.x, room.position.y)
+                } else {
+                    null
+                }
+                
                 _mapState.value = _mapState.value.copy(
                     destinationRoom = room,
                     destinationNode = destinationNode,
                     route = null,
                     startNode = null,
-                    selectedBuilding = buildingId
+                    selectedBuilding = buildingId,
+                    crossBuildingRoute = null,
+                    currentSegmentIndex = 0,
+                    focusTarget = focusCoord
                 )
                 
-                // Switch to correct building
                 switchBuilding(buildingId)
                 
-                // Set initial bounds
-                destinationNode?.let { node ->
-                    initialBounds = BoundingBox(
-                        node.x - 20.0,
-                        node.y - 20.0,
-                        node.x + 20.0,
-                        node.y + 20.0
-                    )
+                if (focusCoord != null) {
+                    centerOnCoordinate(focusCoord.first, focusCoord.second)
                 }
+            }
+        }
+    }
+    
+    fun centerOnCoordinate(worldX: Double, worldY: Double) {
+        viewModelScope.launch {
+            val mapInfo = _mapInfo.value
+            if (mapInfo != null) {
+                val targetScale = 1.5f.coerceIn(0.5f, 5f)
+                _mapState.value = _mapState.value.copy(
+                    scale = targetScale,
+                    translateX = 0f,
+                    translateY = 0f,
+                    focusTarget = Pair(worldX, worldY)
+                )
+                _recenterTrigger.value = _recenterTrigger.value + 1
+                android.util.Log.d("MapViewModel", "Centering on coordinate: ($worldX, $worldY) with scale $targetScale")
+                
+                kotlinx.coroutines.delay(100)
+                _mapState.value = _mapState.value.copy(focusTarget = null)
             }
         }
     }
@@ -351,7 +359,6 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
         _mapState.value = _mapState.value.copy(
             scale = newScale
         )
-        // Trigger a re-render by updating translate (even if unchanged)
         _mapState.value = _mapState.value.copy(
             translateX = _mapState.value.translateX,
             translateY = _mapState.value.translateY
@@ -365,7 +372,6 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
         _mapState.value = _mapState.value.copy(
             scale = newScale
         )
-        // Trigger a re-render by updating translate (even if unchanged)
         _mapState.value = _mapState.value.copy(
             translateX = _mapState.value.translateX,
             translateY = _mapState.value.translateY
@@ -400,18 +406,13 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                 android.util.Log.d("MapViewModel", "Current segment: $currentSegment/${crossRoute.segments.size - 1}, Next building: $nextBuildingId")
                 android.util.Log.d("MapViewModel", "Next segment route nodes: ${nextSegment.route.nodes.size}")
                 
-                // First, clear the current route to avoid drawing old route on new map
                 _mapState.value = _mapState.value.copy(
                     route = null,
                     navigationSteps = emptyList()
                 )
                 
-                // Switch the building (this loads the new map bitmap and updates state)
-                // This is a suspend function, so it will complete before we continue
                 switchBuilding(nextBuildingId)
                 
-                // After building switch completes, update the route and navigation state for the new segment
-                // switchBuilding already updates selectedBuilding and bitmap, but we need to set the route
                 _mapState.value = _mapState.value.copy(
                     currentSegmentIndex = currentSegment + 1,
                     route = nextSegment.route,
@@ -419,8 +420,8 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                     destinationNode = nextSegment.route.nodes.lastOrNull(),
                     navigationSteps = nextSegment.route.steps,
                     currentStepIndex = 0,
-                    selectedBuilding = nextBuildingId, // Ensure this is set (switchBuilding should have done this)
-                    scale = 1f, // Reset zoom when switching buildings
+                    selectedBuilding = nextBuildingId,
+                    scale = 1f,
                     translateX = 0f,
                     translateY = 0f
                 )
@@ -430,30 +431,18 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
     
-    
-    /**
-     * Get the route for the currently selected building.
-     * For cross-building routes, returns the segment route for the selected building.
-     * For single-building routes, returns the route if it matches the selected building.
-     */
     fun getRouteForBuilding(buildingId: String): Route? {
         val state = _mapState.value
         val crossRoute = state.crossBuildingRoute
         
         if (crossRoute != null) {
-            // Find the segment for this building
             val segment = crossRoute.segments.find { it.buildingId == buildingId }
             return segment?.route
         } else {
-            // Single-building route - only return if it matches the selected building
-            // For now, if there's a route and no cross-building route, assume it's for the current building
             return state.route
         }
     }
     
-    /**
-     * Get the segment index for a given building in a cross-building route
-     */
     fun getSegmentIndexForBuilding(buildingId: String): Int? {
         val crossRoute = _mapState.value.crossBuildingRoute ?: return null
         return crossRoute.segments.indexOfFirst { it.buildingId == buildingId }.takeIf { it >= 0 }
@@ -475,7 +464,6 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
     
     fun loadSOSRoute(startNodeId: String) {
         viewModelScope.launch {
-            
             if (!repository.isDataLoaded()) {
                 val success = repository.loadAllAssets()
                 if (!success || !repository.isDataLoaded()) {
@@ -496,7 +484,6 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
             val startNode = repository.getNodeById(startNodeId)
             
             if (exitNode == null || startNode == null) {
-                
                 _mapState.value = _mapState.value.copy(
                     route = null,
                     destinationRoom = null,
@@ -514,7 +501,7 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
             
             _mapState.value = _mapState.value.copy(
                 route = route,
-                destinationRoom = null, // No room for exit
+                destinationRoom = null,
                 startNode = startNode,
                 destinationNode = exitNode,
                 navigationSteps = if (isRouteUnavailable) emptyList() else route.steps,
@@ -523,7 +510,6 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
             )
             
             if (!isRouteUnavailable) {
-                // route is guaranteed to be non-null when !isRouteUnavailable
                 val nodes = route!!.nodes
                 val minX = nodes.minOfOrNull { it.x } ?: 0.0
                 val minY = nodes.minOfOrNull { it.y } ?: 0.0
