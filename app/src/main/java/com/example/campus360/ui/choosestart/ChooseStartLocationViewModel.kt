@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.campus360.data.Landmark
 import com.example.campus360.data.MapRepository
 import com.example.campus360.data.Room
-import com.example.campus360.navigation.Screen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow   
 import kotlinx.coroutines.flow.asStateFlow
@@ -100,26 +99,6 @@ class ChooseStartLocationViewModel(application: Application) : AndroidViewModel(
         }
     }
     
-    fun showMapPicker() {
-        android.util.Log.d("ChooseStartLocationViewModel", "Show map picker requested")
-        val destinationRoom = _destinationRoom.value
-        if (destinationRoom != null) {
-            android.util.Log.d("ChooseStartLocationViewModel", "Navigating to map picker for room: ${destinationRoom.id}")
-            _uiState.value = ChooseStartLocationUiState.ShowMapPicker(destinationRoom.id)
-        } else {
-            android.util.Log.e("ChooseStartLocationViewModel", "Destination room is null, cannot show map picker")
-        }
-    }
-    
-    fun selectNodeFromMap(nodeId: String) {
-        val destinationRoom = _destinationRoom.value
-        if (destinationRoom != null) {
-            _uiState.value = ChooseStartLocationUiState.NavigateToMap(
-                roomId = destinationRoom.id,
-                startNodeId = nodeId
-            )
-        }
-    }
     
     fun clearNavigation() {
         _uiState.value = ChooseStartLocationUiState.Idle

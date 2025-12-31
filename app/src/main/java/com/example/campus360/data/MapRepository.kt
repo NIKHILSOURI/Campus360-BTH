@@ -39,9 +39,6 @@ class MapRepository(private val context: Context) {
     // Multi-building accessors
     fun getBuilding(buildingId: String): BuildingData? = _buildings[buildingId]
     fun getAllBuildings(): Map<String, BuildingData> = _buildings.toMap()
-    fun getBuildingRooms(buildingId: String): List<Room> = _buildings[buildingId]?.rooms ?: emptyList()
-    fun getBuildingGraph(buildingId: String): Graph? = _buildings[buildingId]?.graph
-    fun getBuildingMapInfo(buildingId: String): MapInfo? = _buildings[buildingId]?.mapInfo
     suspend fun getBuildingBitmap(buildingId: String): Bitmap? = withContext(Dispatchers.IO) {
         val building = _buildings[buildingId] ?: return@withContext null
         try {
@@ -523,7 +520,6 @@ class MapRepository(private val context: Context) {
         
         // Same building - use regular route
         if (startBuildingId == endBuildingId) {
-            val building = _buildings[startBuildingId] ?: return null
             val route = getRoute(startRoom.nodeId, endRoom.nodeId, startBuildingId)
             return if (route != null) {
                 CrossBuildingRoute(
@@ -583,27 +579,8 @@ class MapRepository(private val context: Context) {
         return if (room.building.contains("J")) "J" else "H"
     }
     
-    fun findNearestNode(x: Double, y: Double): Node? {
-        if (!isDataLoaded()) {
-            android.util.Log.w("MapRepository", "Data not loaded when finding nearest node")
-            return null
-        }
-        val engine = getRoutingEngine() ?: return null
-        return try {
-            engine.findNearestNode(x, y)
-        } catch (e: Exception) {
-            android.util.Log.e("MapRepository", "Error finding nearest node", e)
-            null
-        }
-    }
-    
     fun getNodeById(nodeId: String): Node? {
         return _nodesById[nodeId]
-    }
-    
-    fun getNodesByIds(nodeIds: List<String>): List<Node> {
-        if (_nodesById.isEmpty()) return emptyList()
-        return nodeIds.mapNotNull { id -> _nodesById[id] }
     }
     
     fun getExitNodes(): List<Node> {

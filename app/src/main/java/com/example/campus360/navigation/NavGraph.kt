@@ -43,7 +43,7 @@ fun NavGraph(navController: NavHostController) {
         ) { backStackEntry ->
             val query = try {
                 URLDecoder.decode(backStackEntry.arguments?.getString("query") ?: "", "UTF-8")
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 backStackEntry.arguments?.getString("query") ?: ""
             }
             SearchScreen(navController = navController, query = query)

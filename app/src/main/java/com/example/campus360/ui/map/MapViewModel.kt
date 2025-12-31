@@ -116,7 +116,6 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
             
             android.util.Log.d("MapViewModel", "Building $buildingId found, loading bitmap: ${building.mapImageAsset}")
             val bitmap = repository.getBuildingBitmap(buildingId)
-            val mapInfo = building.mapInfo
             
             if (bitmap == null) {
                 android.util.Log.e("MapViewModel", "Failed to load bitmap for building $buildingId")
@@ -124,13 +123,8 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                 return@launch
             }
             
-            // mapInfo is guaranteed to be non-null from building object, but check for safety
+            // mapInfo is guaranteed to be non-null from building object
             val finalMapInfo = building.mapInfo
-            if (finalMapInfo == null) {
-                android.util.Log.e("MapViewModel", "MapInfo is null for building $buildingId")
-                _uiState.value = MapUiState.Error("Map info not available for Building $buildingId")
-                return@launch
-            }
             
             // Get the route for this building (if there's a cross-building route)
             val routeForBuilding = getRouteForBuilding(buildingId)
@@ -268,7 +262,7 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                 destinationRoom = endRoom,
                 startNode = startNode,
                 destinationNode = destinationNode,
-                navigationSteps = if (isRouteUnavailable) emptyList() else (route?.steps ?: emptyList()),
+                navigationSteps = if (isRouteUnavailable) emptyList() else route.steps,
                 currentStepIndex = 0,
                 isRouteUnavailable = isRouteUnavailable,
                 selectedBuilding = buildingId
@@ -278,24 +272,22 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
             switchBuilding(buildingId)
             
             if (!isRouteUnavailable) {
-                route?.let { validRoute ->
-                    val nodes = validRoute.nodes
-                    val minX = nodes.minOfOrNull { it.x } ?: 0.0
-                    val minY = nodes.minOfOrNull { it.y } ?: 0.0
-                    val maxX = nodes.maxOfOrNull { it.x } ?: 0.0
-                    val maxY = nodes.maxOfOrNull { it.y } ?: 0.0
-                    
-                    initialBounds = BoundingBox(minX, minY, maxX, maxY)
-                }
+                // route is guaranteed to be non-null when !isRouteUnavailable
+                val nodes = route!!.nodes
+                val minX = nodes.minOfOrNull { it.x } ?: 0.0
+                val minY = nodes.minOfOrNull { it.y } ?: 0.0
+                val maxX = nodes.maxOfOrNull { it.x } ?: 0.0
+                val maxY = nodes.maxOfOrNull { it.y } ?: 0.0
+                
+                initialBounds = BoundingBox(minX, minY, maxX, maxY)
             } else if (destinationNode != null) {
-                destinationNode.let { node ->
-                    initialBounds = BoundingBox(
-                        node.x - 20.0,
-                        node.y - 20.0,
-                        node.x + 20.0,
-                        node.y + 20.0
-                    )
-                }
+                val node = destinationNode
+                initialBounds = BoundingBox(
+                    node.x - 20.0,
+                    node.y - 20.0,
+                    node.x + 20.0,
+                    node.y + 20.0
+                )
             }
         }
     }
@@ -332,12 +324,6 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
     
-    fun getInitialBounds(): BoundingBox? {
-        return initialBounds ?: _mapInfo.value?.let { info ->
-            BoundingBox(0.0, 0.0, info.width, info.height)
-        }
-    }
-    
     fun updateMapState(scale: Float, translateX: Float, translateY: Float) {
         _mapState.value = _mapState.value.copy(
             scale = scale,
@@ -355,10 +341,6 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
             translateX = 0f,
             translateY = 0f
         )
-        _recenterTrigger.value = _recenterTrigger.value + 1
-    }
-    
-    fun triggerRecenter() {
         _recenterTrigger.value = _recenterTrigger.value + 1
     }
     
@@ -448,19 +430,6 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
     
-    fun hasNextBuildingSegment(): Boolean {
-        val crossRoute = _mapState.value.crossBuildingRoute ?: return false
-        return _mapState.value.currentSegmentIndex < crossRoute.segments.size - 1
-    }
-    
-    fun getCurrentSegmentInstruction(): String? {
-        val crossRoute = _mapState.value.crossBuildingRoute ?: return null
-        val currentSegment = _mapState.value.currentSegmentIndex
-        if (currentSegment < crossRoute.segments.size) {
-            return crossRoute.segments[currentSegment].instruction
-        }
-        return null
-    }
     
     /**
      * Get the route for the currently selected building.
@@ -494,14 +463,6 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
         val steps = _mapState.value.navigationSteps
         if (index >= 0 && index < steps.size) {
             _mapState.value = _mapState.value.copy(currentStepIndex = index)
-        }
-    }
-    
-    fun nextStep() {
-        val currentIndex = _mapState.value.currentStepIndex
-        val steps = _mapState.value.navigationSteps
-        if (currentIndex < steps.size - 1) {
-            _mapState.value = _mapState.value.copy(currentStepIndex = currentIndex + 1)
         }
     }
     
@@ -556,21 +517,20 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                 destinationRoom = null, // No room for exit
                 startNode = startNode,
                 destinationNode = exitNode,
-                navigationSteps = if (isRouteUnavailable) emptyList() else (route?.steps ?: emptyList()),
+                navigationSteps = if (isRouteUnavailable) emptyList() else route.steps,
                 currentStepIndex = 0,
                 isRouteUnavailable = isRouteUnavailable
             )
             
             if (!isRouteUnavailable) {
-                route?.let { validRoute ->
-                    val nodes = validRoute.nodes
-                    val minX = nodes.minOfOrNull { it.x } ?: 0.0
-                    val minY = nodes.minOfOrNull { it.y } ?: 0.0
-                    val maxX = nodes.maxOfOrNull { it.x } ?: 0.0
-                    val maxY = nodes.maxOfOrNull { it.y } ?: 0.0
-                    
-                    initialBounds = BoundingBox(minX, minY, maxX, maxY)
-                }
+                // route is guaranteed to be non-null when !isRouteUnavailable
+                val nodes = route!!.nodes
+                val minX = nodes.minOfOrNull { it.x } ?: 0.0
+                val minY = nodes.minOfOrNull { it.y } ?: 0.0
+                val maxX = nodes.maxOfOrNull { it.x } ?: 0.0
+                val maxY = nodes.maxOfOrNull { it.y } ?: 0.0
+                
+                initialBounds = BoundingBox(minX, minY, maxX, maxY)
             } else {
                 initialBounds = BoundingBox(
                     exitNode.x - 20.0,

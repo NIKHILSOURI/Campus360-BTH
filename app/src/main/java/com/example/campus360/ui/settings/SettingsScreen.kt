@@ -8,7 +8,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -17,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -142,16 +140,16 @@ private fun LanguageSelectionSection(
         
         LanguageOption(
             languageName = context.getString(R.string.english),
-            languageCode = "en",
             isSelected = selectedLanguage == "en",
-            onClick = { onLanguageSelected("en") }
+            onClick = { onLanguageSelected("en") },
+            languageCode = "en"
         )
         
         LanguageOption(
             languageName = context.getString(R.string.swedish),
-            languageCode = "sv",
             isSelected = selectedLanguage == "sv",
-            onClick = { onLanguageSelected("sv") }
+            onClick = { onLanguageSelected("sv") },
+            languageCode = "sv"
         )
     }
 }
@@ -159,9 +157,9 @@ private fun LanguageSelectionSection(
 @Composable
 private fun LanguageOption(
     languageName: String,
-    languageCode: String,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    languageCode: String = ""
 ) {
     Surface(
         modifier = Modifier
@@ -267,9 +265,7 @@ private fun ContactSection() {
         
         ContactItem(
             email = "Test@gmail.com",
-            name = "Nikhi,Ajay,Vaatsav",
-
-
+            name = "Nikhi,Ajay,Vaatsav"
         )
     }
 }

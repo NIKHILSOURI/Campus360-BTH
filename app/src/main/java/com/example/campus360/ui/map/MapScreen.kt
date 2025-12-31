@@ -24,15 +24,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.zIndex
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.util.Locale
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -345,10 +342,10 @@ fun MapScreen(
                             NavigationStepsPanel(
                                 steps = navigationSteps,
                                 currentStepIndex = currentStepIndex,
-                                destinationName = if (sosMode) "Emergency Exit" else (mapState.destinationRoom?.name ?: "Destination"),
                                 onStepClick = { index -> viewModel.setCurrentStepIndex(index) },
                                 onToggleSteps = { showStepsPanel = !showStepsPanel },
                                 isExpanded = showStepsPanel,
+                                destinationName = if (sosMode) "Emergency Exit" else (mapState.destinationRoom?.name ?: "Destination"),
                                 modifier = Modifier
                                     .align(Alignment.BottomStart)
                                     .padding(start = 16.dp, end = 80.dp, bottom = innerPadding.calculateBottomPadding() + 16.dp)
@@ -441,11 +438,11 @@ private fun TopControls(
 private fun NavigationStepsPanel(
     steps: List<NavigationStep>,
     currentStepIndex: Int,
-    destinationName: String,
     onStepClick: (Int) -> Unit,
     onToggleSteps: () -> Unit,
     isExpanded: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    destinationName: String = ""
 ) {
     Column(
         modifier = modifier
@@ -680,7 +677,7 @@ private fun NavigationStepItem(
                 if (step.distance > 0) {
                     val context = LocalContext.current
                     Text(
-                        text = String.format("%.1f %s", step.distance, context.getString(R.string.units)),
+                        text = String.format(Locale.getDefault(), "%.1f %s", step.distance, context.getString(R.string.units)),
                         fontSize = 12.sp,
                         color = Color(0xFF4C669A).copy(alpha = 0.7f)
                     )
@@ -855,7 +852,6 @@ private fun BottomControls(
             containerColor = Color.White,
             elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp)
         ) {
-            val context = LocalContext.current
             // Use a horizontal line as zoom-out icon
             Box(
                 modifier = Modifier.size(24.dp),

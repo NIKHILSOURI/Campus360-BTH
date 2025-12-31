@@ -113,12 +113,12 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                 }
                 true
             } ?: false
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
     
-    private fun saveImageToDownloadsLegacy(bitmap: Bitmap, context: Context): Boolean {
+    private fun saveImageToDownloadsLegacy(bitmap: Bitmap, @Suppress("UNUSED_PARAMETER") context: Context): Boolean {
         return try {
             val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             if (!downloadsDir.exists()) {
@@ -130,7 +130,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             }
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
