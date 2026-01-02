@@ -103,12 +103,6 @@ fun SettingsScreen(
                 }
             )
             
-            DownloadMapSection(
-                onDownloadMap = {
-                    viewModel.downloadMap()
-                }
-            )
-            
             ContactSection()
             
             AboutSection(
@@ -189,58 +183,6 @@ private fun LanguageOption(
                     contentDescription = "Selected",
                     tint = PrimaryBlue,
                     modifier = Modifier.size(24.dp)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun DownloadMapSection(
-    onDownloadMap: () -> Unit
-) {
-    val context = LocalContext.current
-    
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 24.dp)
-    ) {
-        Text(
-            text = context.getString(R.string.map),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF0D121B),
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
-        )
-        
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp)
-                .clickable(onClick = onDownloadMap),
-            shape = RoundedCornerShape(12.dp),
-            color = Color.White
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = context.getString(R.string.download_map),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF0D121B)
-                )
-                
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = "Download",
-                    tint = Color(0xFF9E9E9E),
-                    modifier = Modifier.size(20.dp)
                 )
             }
         }
